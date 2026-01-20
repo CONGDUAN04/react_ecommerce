@@ -1,0 +1,220 @@
+/* Container bọc ngoài */
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hiệu ứng blob background */
+.register-container::before {
+    content: '';
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: linear-gradient(135deg, #818cf8, #c084fc);
+    border-radius: 50%;
+    top: -100px;
+    right: -100px;
+    opacity: 0.1;
+    filter: blur(80px);
+    animation: float1 8s ease-in-out infinite;
+}
+
+.register-container::after {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    border-radius: 50%;
+    bottom: -80px;
+    left: -80px;
+    opacity: 0.1;
+    filter: blur(80px);
+    animation: float2 10s ease-in-out infinite;
+}
+
+@keyframes float1 {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    50% {
+        transform: translate(50px, 50px);
+    }
+}
+
+@keyframes float2 {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    50% {
+        transform: translate(-30px, -30px);
+    }
+}
+
+/* Box glassmorphism */
+.register-box {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 48px 40px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 480px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    position: relative;
+    z-index: 1;
+}
+
+/* Tiêu đề */
+.register-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #1f2937;
+    background: linear-gradient(135deg, #1f2937, #4b5563);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+}
+
+.register-subtitle {
+    text-align: center;
+    font-size: 15px;
+    color: #6b7280;
+    margin-bottom: 32px;
+    font-weight: 400;
+}
+
+/* Form labels */
+.register-box .ant-form-item-label>label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+/* Input fields */
+.register-box .ant-input,
+.register-box .ant-input-password {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1.5px solid rgba(226, 232, 240, 0.8);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.register-box .ant-input:hover,
+.register-box .ant-input-password:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(203, 213, 225, 0.9);
+}
+
+.register-box .ant-input:focus,
+.register-box .ant-input-password .ant-input:focus,
+.register-box .ant-input-focused,
+.register-box .ant-input-affix-wrapper-focused {
+    background: rgba(255, 255, 255, 1);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.register-box .ant-input-affix-wrapper {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1.5px solid rgba(226, 232, 240, 0.8);
+    border-radius: 12px;
+}
+
+.register-box .ant-input-affix-wrapper:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(203, 213, 225, 0.9);
+}
+
+/* Button đăng ký */
+.register-btn {
+    width: 100%;
+    height: 48px;
+    font-size: 15px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border: none;
+    border-radius: 12px;
+    margin-top: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.register-btn:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.register-btn:active {
+    transform: translateY(0);
+}
+
+/* Divider */
+.register-box .ant-divider {
+    margin: 24px 0;
+    border-color: rgba(226, 232, 240, 0.6);
+}
+
+/* Footer */
+.register-footer {
+    text-align: center;
+    margin-top: 4px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.register-footer a {
+    color: #3b82f6;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.register-footer a:hover {
+    color: #2563eb;
+}
+
+/* Error messages */
+.register-box .ant-form-item-explain-error {
+    font-size: 13px;
+    margin-top: 4px;
+    color: #ef4444;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .register-box {
+        padding: 36px 28px;
+        border-radius: 16px;
+    }
+
+    .register-title {
+        font-size: 24px;
+    }
+
+    .register-subtitle {
+        font-size: 14px;
+        margin-bottom: 28px;
+    }
+
+    .register-btn {
+        height: 46px;
+    }
+}
