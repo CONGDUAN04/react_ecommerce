@@ -1,10 +1,12 @@
 import { DeleteOutlined, EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { Table, Image, Button, Popconfirm, Tooltip } from "antd";
-import ProductDetail from "./product.detail";
 import { useContext, useState } from "react";
+
+import ProductDetail from "./product.detail";
 import UpdateProductForm from "./product.update";
-import { deleteProductAPI } from "../../../services/api.services";
-import { NotifyContext } from "../../context/notify.context";
+import { deleteProductAPI } from "../../../services/api.services.js";
+import { NotifyContext } from "../../context/notify.context.jsx";
+import ProductActiveToggle from "./Product.active.toggle.jsx";
 
 const ProductTable = ({
     dataProducts,
@@ -20,7 +22,7 @@ const ProductTable = ({
     const [dataUpdate, setDataUpdate] = useState(null);
     const [openUpdate, setOpenUpdate] = useState(false);
 
-    const { api, contextHolder } = useContext(NotifyContext);
+    const { api } = useContext(NotifyContext);
 
     const handleDelete = async (id) => {
         try {
@@ -82,23 +84,6 @@ const ProductTable = ({
                     }
                     alt={record.name}
                     fallback="https://via.placeholder.com/60?text=No+Image"
-                    preview={{
-                        mask: (
-                            <div
-                                style={{
-                                    background: "rgba(0,0,0,0.5)",
-                                    fontSize: 12,
-                                    color: "#fff",
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    height: "100%",
-                                }}
-                            >
-                                Xem
-                            </div>
-                        ),
-                    }}
                 />
             ),
         },
@@ -121,27 +106,20 @@ const ProductTable = ({
             dataIndex: "quantity",
             align: "center",
             render: (quantity) => {
-                const isLow = quantity <= 5;
-                const isMedium = quantity > 5 && quantity <= 20;
-
                 let colorStyle = {};
-
-                if (isLow) {
-                    // Đỏ - Cảnh báo hết hàng
+                if (quantity <= 5) {
                     colorStyle = {
                         color: "#cf1322",
                         backgroundColor: "#fff1f0",
                         border: "1px solid #ffccc7",
                     };
-                } else if (isMedium) {
-                    // Vàng cam - Cảnh báo sắp hết
+                } else if (quantity <= 20) {
                     colorStyle = {
                         color: "#d46b08",
                         backgroundColor: "#fff7e6",
                         border: "1px solid #ffd591",
                     };
                 } else {
-                    // Xanh lá - Còn nhiều hàng
                     colorStyle = {
                         color: "#389e0d",
                         backgroundColor: "#f6ffed",
@@ -156,7 +134,6 @@ const ProductTable = ({
                             borderRadius: 16,
                             fontWeight: 600,
                             fontSize: 13,
-                            minWidth: 48,
                             display: "inline-block",
                             ...colorStyle,
                         }}
@@ -180,8 +157,6 @@ const ProductTable = ({
                         color: "#1677ff",
                         backgroundColor: "#e6f4ff",
                         border: "1px solid #91caff",
-                        minWidth: 48,
-                        display: "inline-block",
                     }}
                 >
                     {sold || 0}
@@ -195,20 +170,27 @@ const ProductTable = ({
             render: (name) => (
                 <span
                     style={{
-                        padding: "4px 14px",
-                        borderRadius: 16,
+                        padding: "4px 12px",
+                        borderRadius: 12,
                         fontSize: 13,
                         fontWeight: 500,
-                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                        color: "#fff",
-                        border: "none",
-                        display: "inline-block",
-                        whiteSpace: "nowrap",
-                        boxShadow: "0 2px 8px rgba(102, 126, 234, 0.15)",
+                        backgroundColor: "#f0f5ff",
+                        color: "#2f54eb",
+                        border: "1px solid #adc6ff",
                     }}
                 >
                     {name}
                 </span>
+            ),
+        },
+        {
+            title: <div style={{ fontWeight: 600 }}>Trạng thái</div>,
+            align: "center",
+            render: (_, record) => (
+                <ProductActiveToggle
+                    record={record}
+                    loadProducts={loadProducts}
+                />
             ),
         },
         {
@@ -222,7 +204,6 @@ const ProductTable = ({
                         display: "flex",
                         gap: 8,
                         justifyContent: "center",
-                        alignItems: "center",
                     }}
                 >
                     <Tooltip title="Xem chi tiết">
@@ -241,43 +222,54 @@ const ProductTable = ({
                         />
                     </Tooltip>
 
-                    <Tooltip title="Chỉnh sửa">
+                    <Tooltip
+                        title={
+                            record.isActive
+                                ? "Chỉnh sửa"
+                                : "Sản phẩm đã ngừng bán"
+                        }
+                    >
                         <Button
                             icon={<EditOutlined />}
+                            disabled={!record.isActive}
                             style={{
                                 backgroundColor: "#fff7e6",
                                 color: "#fa8c16",
                                 border: "1px solid #ffd591",
                                 borderRadius: 8,
+                                opacity: record.isActive ? 1 : 0.5,
                             }}
                             onClick={() => {
+                                if (!record.isActive) return;
                                 setDataUpdate(record);
                                 setOpenUpdate(true);
                             }}
                         />
                     </Tooltip>
 
-                    <Popconfirm
-                        title="Xóa sản phẩm"
-                        description="Bạn có chắc chắn muốn xóa sản phẩm này?"
-                        okText="Xóa"
-                        cancelText="Hủy"
-                        okButtonProps={{ danger: true }}
-                        onConfirm={() => handleDelete(record.id)}
-                    >
-                        <Tooltip title="Xóa">
-                            <Button
-                                icon={<DeleteOutlined />}
-                                danger
-                                style={{
-                                    backgroundColor: "#fff1f0",
-                                    color: "#ff4d4f",
-                                    border: "1px solid #ffccc7",
-                                    borderRadius: 8,
-                                }}
-                            />
-                        </Tooltip>
-                    </Popconfirm>
+                    {record.isActive && (
+                        <Popconfirm
+                            title="Xóa sản phẩm"
+                            description="Bạn có chắc chắn muốn xóa sản phẩm này?"
+                            okText="Xóa"
+                            cancelText="Hủy"
+                            okButtonProps={{ danger: true }}
+                            onConfirm={() => handleDelete(record.id)}
+                        >
+                            <Tooltip title="Xóa">
+                                <Button
+                                    icon={<DeleteOutlined />}
+                                    danger
+                                    style={{
+                                        backgroundColor: "#fff1f0",
+                                        color: "#ff4d4f",
+                                        border: "1px solid #ffccc7",
+                                        borderRadius: 8,
+                                    }}
+                                />
+                            </Tooltip>
+                        </Popconfirm>
+                    )}
                 </div>
             ),
         },
@@ -285,7 +277,6 @@ const ProductTable = ({
 
     return (
         <>
-            {contextHolder}
             <div
                 style={{
                     border: "1px solid #f0f0f0",
