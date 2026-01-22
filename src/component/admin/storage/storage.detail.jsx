@@ -1,4 +1,4 @@
-import { Modal, Descriptions, Divider, Card, Row, Col, Empty } from "antd";
+import { Modal, Descriptions, Divider, Card, Row, Col, Empty, Typography } from "antd";
 import dayjs from "dayjs";
 
 const StorageDetail = ({ dataDetail, setDataDetail, openDetail, setOpenDetail }) => {
@@ -29,13 +29,31 @@ const StorageDetail = ({ dataDetail, setDataDetail, openDetail, setOpenDetail })
                 labelStyle={{ fontWeight: 600, width: 140 }}
             >
                 <Descriptions.Item label="ID">{dataDetail.id}</Descriptions.Item>
-                <Descriptions.Item label="Tên dung lượng">{dataDetail.name}</Descriptions.Item>
+
+                <Descriptions.Item label="SKU">
+                    <span
+                        style={{
+                            fontFamily: "monospace",
+                            fontWeight: 500,
+                            color: "#262626",
+                        }}
+                    >
+                        {dataDetail.sku || "N/A"}
+                    </span>
+                </Descriptions.Item>
+
+
+                <Descriptions.Item label="Tên dung lượng">
+                    {dataDetail.name}
+                </Descriptions.Item>
+
                 <Descriptions.Item label="Giá">
                     {dataDetail.price?.toLocaleString("vi-VN")}₫
                 </Descriptions.Item>
                 <Descriptions.Item label="Tồn kho">{dataDetail.quantity}</Descriptions.Item>
                 <Descriptions.Item label="Đã bán">{dataDetail.sold || 0}</Descriptions.Item>
             </Descriptions>
+
 
             {/* ===== Thông tin màu ===== */}
             {color && (

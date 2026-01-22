@@ -6,13 +6,6 @@ import { StorageTable } from "../storage/storage.table";
 import { LoadingContext } from "../../context/loading.context";
 import CreateStorageForm from "../storage/storage.create";
 
-// const normalizeArray = (res) => {
-//     if (!res?.data) return [];
-//     if (Array.isArray(res.data)) return res.data;
-//     if (Array.isArray(res.data.data)) return res.data.data;
-//     return [];
-// };
-
 const StoragePage = () => {
     const [dataStorage, setDataStorage] = useState([]);
     const [current, setCurrent] = useState(1);

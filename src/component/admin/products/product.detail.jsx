@@ -6,6 +6,7 @@ import {
     Row,
     Col,
     Empty,
+    Typography,
 } from "antd";
 import dayjs from "dayjs";
 
@@ -52,6 +53,11 @@ const ProductDetail = ({
 
                         <Descriptions.Item label="Tên sản phẩm">
                             {dataDetail.name}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Slug">
+                            <span style={{ color: "#555", fontFamily: "monospace" }}>
+                                {dataDetail.slug || "N/A"}
+                            </span>
                         </Descriptions.Item>
 
                         <Descriptions.Item label="Thương hiệu">

@@ -30,7 +30,6 @@ const UserDetail = ({ dataDetail, setDataDetail, openDetail, setOpenDetail }) =>
                     >
                         <Descriptions.Item label="Email:">{dataDetail.username}</Descriptions.Item>
                         <Descriptions.Item label="Tên:">{dataDetail.fullName}</Descriptions.Item>
-                        <Descriptions.Item label="Địa chỉ:">{dataDetail.address}</Descriptions.Item>
                         <Descriptions.Item label="Số điện thoại">{dataDetail.phone}</Descriptions.Item>
                         <Descriptions.Item label="Phân quyền">{dataDetail.role?.name || "N/A"}</Descriptions.Item>
                         <Descriptions.Item label="Phân loại tài khoản">{dataDetail.accountType}</Descriptions.Item>

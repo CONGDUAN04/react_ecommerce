@@ -24,7 +24,6 @@ export default function UpdateUserForm({
     const { api, contextHolder } = useContext(NotifyContext);
     const { loading, setLoading } = useContext(LoadingContext);
 
-    // Load roles cho select
     useEffect(() => {
         const loadRoles = async () => {
             try {
@@ -47,7 +46,6 @@ export default function UpdateUserForm({
             username: dataUpdate.username,
             fullName: dataUpdate.fullName,
             phone: dataUpdate.phone,
-            address: dataUpdate.address,
             roleId: dataUpdate.role?.id,
         });
         if (dataUpdate.avatar) {
@@ -133,9 +131,6 @@ export default function UpdateUserForm({
                         <Input />
                     </Form.Item>
 
-                    <Form.Item label="Địa chỉ" name="address">
-                        <Input />
-                    </Form.Item>
 
                     <Form.Item label="Phân quyền" name="roleId" rules={[{ required: true, message: "Role không được để trống" }]}>
                         <Select options={roles.map(r => ({ label: r.name, value: r.id }))} />

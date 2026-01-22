@@ -62,6 +62,28 @@ export const StorageTable = (props) => {
             ),
         },
         {
+            title: <div style={{ fontWeight: 600 }}>Mã sản phẩm</div>,
+            dataIndex: "sku",
+            width: 160,
+            align: "center",
+            render: (sku) => (
+                <span
+                    style={{
+                        padding: "4px 10px",
+                        borderRadius: 6,
+                        fontSize: 12,
+                        fontWeight: 600,
+                        backgroundColor: "#fafafa",
+                        border: "1px dashed #d9d9d9",
+                        color: "#262626",
+                        fontFamily: "monospace",
+                    }}
+                >
+                    {sku}
+                </span>
+            ),
+        },
+        {
             title: <div style={{ fontWeight: 600 }}>Dung lượng</div>,
             dataIndex: "name",
             width: 200,

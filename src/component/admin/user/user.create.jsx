@@ -52,7 +52,6 @@ export default function CreateUserForm({ loadUsers }) {
                 username: values.username,
                 fullName: values.fullName,
                 phone: values.phone,
-                address: values.address,
                 roleId: values.roleId,
                 avatar,
             });
@@ -149,10 +148,6 @@ export default function CreateUserForm({ loadUsers }) {
                     </Form.Item>
 
                     <Form.Item label="Số điện thoại" name="phone" rules={[{ required: true, message: "Số điện thoại không được bỏ trống" }]}>
-                        <Input />
-                    </Form.Item>
-
-                    <Form.Item label="Địa chỉ" name="address">
                         <Input />
                     </Form.Item>
 

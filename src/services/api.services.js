@@ -44,15 +44,17 @@ export const createColorAPI = (data) => {
     return axios.post("/api/admin/colors", formData);
 };
 
-export const createStoragesAPI = ({ colorId, storages }) =>
-    axios.post("/api/admin/storages", {
-        colorId: Number(colorId),
+export const createStoragesAPI = ({ colorId, storages }) => {
+    return axios.post("/api/admin/storages", {
+        colorId: colorId,  // Gửi string, để Zod tự validate và transform
         storages: storages.map(s => ({
-            name: s.name.trim(),
+            sku: s.sku,
+            name: s.name,
             price: s.price,
-            quantity: Number(s.quantity),
+            quantity: s.quantity,
         })),
     });
+};
 
 export const registerUserAPI = (data) =>
     axios.post("/api/register", data);
