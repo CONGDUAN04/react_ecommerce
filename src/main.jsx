@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import 'antd/dist/reset.css';
-
+import "../src/index.css"
 import App from './App.jsx';
 import AppUser from "./AppUser.jsx";
 import HomePage from './component/admin/pages/dashboard.jsx';

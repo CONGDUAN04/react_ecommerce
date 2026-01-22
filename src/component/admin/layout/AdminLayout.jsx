@@ -5,7 +5,7 @@ const AdminLayout = ({ children }) => {
                 padding: "24px",
                 width: "100%",
                 boxSizing: "border-box",
-                overflow: "hidden",   // ⭐ QUAN TRỌNG
+                overflow: "hidden",
 
             }}
         >
@@ -13,5 +13,4 @@ const AdminLayout = ({ children }) => {
         </div>
     );
 };
-
 export default AdminLayout;
