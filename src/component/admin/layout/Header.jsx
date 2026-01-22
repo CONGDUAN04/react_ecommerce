@@ -1,11 +1,16 @@
-import { useLocation } from 'react-router-dom';
-import { useContext } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useContext, useState } from 'react';
 import { AuthContext } from '../../context/auth.context.jsx';
-import { Search, Bell, MessageSquare, ChevronDown } from 'lucide-react';
+import { NotifyContext } from "../../context/notify.context.jsx";
+import { logoutAPI } from '../../../services/api.services.js';
+import { Search, Bell, MessageSquare, ChevronDown, LogOut, User, Settings } from 'lucide-react';
 
 function Header() {
     const location = useLocation();
-    const { user } = useContext(AuthContext);
+    const navigate = useNavigate();
+    const { user, setUser } = useContext(AuthContext);
+    const { api } = useContext(NotifyContext);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
     const path = location.pathname;
 
     const getPageTitle = () => {
@@ -19,6 +24,31 @@ function Header() {
         if (path.startsWith('/admin/targets')) return 'Nhu cầu sử dụng';
         if (path.startsWith('/admin/settings')) return 'Cài đặt';
         return 'Dashboard';
+    };
+
+    const handleLogout = async () => {
+        try {
+            const res = await logoutAPI();
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("user");
+            setUser(null);
+            api.success({
+                message: "Đăng xuất thành công",
+                description: res?.message || "Bạn đã đăng xuất khỏi hệ thống",
+                duration: 2,
+            });
+            setTimeout(() => {
+                navigate('/login');
+            }, 500);
+        } catch (error) {
+            api.error({
+                message: "Lỗi đăng xuất",
+                description: error?.message || "Có lỗi xảy ra",
+                duration: 2,
+            });
+        } finally {
+            setDropdownOpen(false);
+        }
     };
 
     const pageTitle = getPageTitle();
@@ -80,38 +110,105 @@ function Header() {
                     {/* Divider */}
                     <div className="w-px h-8 bg-gradient-to-b from-transparent via-gray-300 to-transparent mx-1" />
 
-                    {/* User Profile */}
-                    <div className="flex items-center gap-3 cursor-pointer group bg-gray-50/50 hover:bg-gray-100/50 rounded-xl px-3 py-2 border border-transparent hover:border-gray-200 transition-all duration-200">
-                        {/* Avatar */}
-                        <div className="relative">
-                            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center text-sm font-bold transition-all duration-200 group-hover:scale-105 overflow-hidden shadow-lg shadow-blue-500/20">
-                                {user?.avatar ? (
-                                    <img
-                                        src={`${import.meta.env.VITE_BACKEND_URL}/images/avatar/${user.avatar}`}
-                                        alt="Avatar"
-                                        className="w-full h-full object-cover"
-                                        onError={(e) => {
-                                            e.target.style.display = 'none';
+                    {/* User Profile with Dropdown */}
+                    <div className="relative">
+                        <button
+                            onClick={() => setDropdownOpen(!dropdownOpen)}
+                            className="flex items-center gap-3 cursor-pointer group bg-gray-50/50 hover:bg-gray-100/50 rounded-xl px-3 py-2 border border-transparent hover:border-gray-200 transition-all duration-200"
+                        >
+                            {/* Avatar */}
+                            <div className="relative">
+                                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center text-sm font-bold transition-all duration-200 group-hover:scale-105 overflow-hidden shadow-lg shadow-blue-500/20">
+                                    {user?.avatar ? (
+                                        <img
+                                            src={`${import.meta.env.VITE_BACKEND_URL}/images/avatar/${user.avatar}`}
+                                            alt="Avatar"
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => {
+                                                e.target.style.display = 'none';
+                                            }}
+                                        />
+                                    ) : (
+                                        (user?.fullName || user?.name)?.substring(0, 2).toUpperCase() || null
+                                    )}
+                                </div>
+                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
+                            </div>
+
+                            {/* Name & Role */}
+                            <div className="flex flex-col">
+                                <div className="text-sm font-semibold text-gray-900 leading-tight group-hover:text-blue-600 transition-colors">
+                                    {user?.fullName || user?.name || user?.email || ''}
+                                </div>
+                                <div className="text-xs text-gray-500 leading-tight">
+                                    {user?.role?.name || ''}
+                                </div>
+                            </div>
+
+                            <ChevronDown
+                                size={16}
+                                className={`text-gray-400 group-hover:text-gray-600 transition-all ${dropdownOpen ? 'rotate-180' : ''
+                                    }`}
+                            />
+                        </button>
+
+                        {/* Dropdown Menu */}
+                        {dropdownOpen && (
+                            <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                {/* User Info */}
+                                <div className="px-4 py-3 border-b border-gray-100">
+                                    <div className="text-sm font-semibold text-gray-900">
+                                        {user?.fullName || user?.name || ''}
+                                    </div>
+                                    <div className="text-xs text-gray-500 mt-1">
+                                        {user?.email || ''}
+                                    </div>
+                                </div>
+
+                                {/* Menu Items */}
+                                <div className="py-2">
+                                    <button
+                                        onClick={() => {
+                                            navigate('/profile');
+                                            setDropdownOpen(false);
                                         }}
-                                    />
-                                ) : (
-                                    (user?.fullName || user?.name)?.substring(0, 2).toUpperCase() || null
-                                )}
-                            </div>
-                            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
-                        </div>
+                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                                    >
+                                        <User size={16} />
+                                        <span>Hồ sơ cá nhân</span>
+                                    </button>
 
-                        {/* Name & Role */}
-                        <div className="flex flex-col">
-                            <div className="text-sm font-semibold text-gray-900 leading-tight group-hover:text-blue-600 transition-colors">
-                                {user?.fullName || user?.name || user?.email || ''}
-                            </div>
-                            <div className="text-xs text-gray-500 leading-tight">
-                                {user?.role?.name || ''}
-                            </div>
-                        </div>
+                                    <button
+                                        onClick={() => {
+                                            navigate('/settings');
+                                            setDropdownOpen(false);
+                                        }}
+                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                                    >
+                                        <Settings size={16} />
+                                        <span>Cài đặt</span>
+                                    </button>
 
-                        <ChevronDown size={16} className="text-gray-400 group-hover:text-gray-600 transition-all group-hover:translate-y-0.5" />
+                                    <div className="my-1 border-t border-gray-100" />
+
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200"
+                                    >
+                                        <LogOut size={16} />
+                                        <span>Đăng xuất</span>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Overlay to close dropdown */}
+                        {dropdownOpen && (
+                            <div
+                                className="fixed inset-0 z-40"
+                                onClick={() => setDropdownOpen(false)}
+                            />
+                        )}
                     </div>
                 </div>
             </div>

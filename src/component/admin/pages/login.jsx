@@ -9,20 +9,25 @@ import "../styles/login.css";
 const LoginPage = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false); // chỉ cho nút
+    const [loading, setLoading] = useState(false);
     const { setUser } = useContext(AuthContext);
     const { api, contextHolder } = useContext(NotifyContext);
 
     const onFinish = async (values) => {
         setLoading(true);
         try {
+            // ✅ loginUserAPI trả về response.data (vì interceptor đã xử lý)
+            // Cấu trúc: { data: { access_token, ... }, message: "..." }
             const res = await loginUserAPI(values.email, values.password);
             const token = res?.data?.access_token;
+
             if (!token) throw new Error("No access token returned");
 
             localStorage.setItem("access_token", token);
 
+            // ✅ Lúc này axios interceptor sẽ tự thêm Authorization header
             const userRes = await getAccountAPI();
+            // userRes cấu trúc: { data: { user: {...} }, message: "..." }
             const user = userRes?.data?.user || null;
 
             setUser(user);
@@ -105,7 +110,6 @@ const LoginPage = () => {
                 </div>
             </div>
         </>
-
     );
 };
 

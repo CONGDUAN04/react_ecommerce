@@ -1,8 +1,4 @@
-import {
-    Form,
-    Input,
-    Modal,
-} from "antd";
+import { Form, Input, Modal } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useContext, useEffect, useState } from "react";
 import { updateBrandAPI } from "../../../services/api.services.js";
@@ -19,29 +15,23 @@ export default function UpdateBrand({
     const [form] = Form.useForm();
     const [preview, setPreview] = useState(null);
     const [file, setFile] = useState(null);
-
     const { api, contextHolder } = useContext(NotifyContext);
     const { loading, setLoading } = useContext(LoadingContext);
 
     useEffect(() => {
         if (!dataUpdate) return;
-
         form.setFieldsValue({
             id: dataUpdate.id,
             name: dataUpdate.name,
         });
-
-        if (dataUpdate.imageBrand) {
-            setPreview(
-                `${import.meta.env.VITE_BACKEND_URL}/images/brand/${dataUpdate.imageBrand}`
-            );
+        if (dataUpdate.image) {
+            setPreview(`${import.meta.env.VITE_BACKEND_URL}/images/brand/${dataUpdate.image}`);
         }
     }, [dataUpdate, form]);
 
     const handleOnchangeFile = (e) => {
         const selectedFile = e.target.files?.[0];
         if (!selectedFile) return;
-
         setFile(selectedFile);
         setPreview(URL.createObjectURL(selectedFile));
     };
@@ -51,15 +41,13 @@ export default function UpdateBrand({
         try {
             const res = await updateBrandAPI(dataUpdate.id, {
                 name: values.name,
-                imageBrand: file,
+                image: file,
             });
-
             api.success({
                 message: "Thành Công",
                 description: res?.message,
                 duration: 5
             });
-
             resetAndClose();
             await loadBrand();
         } catch (error) {
@@ -70,9 +58,7 @@ export default function UpdateBrand({
                 }));
                 form.setFields(formErrors);
             } else {
-                const errorMessage = error.response?.data?.message ||
-                    error.message ||
-                    "Đã có lỗi xảy ra";
+                const errorMessage = error.response?.data?.message || error.message || "Đã có lỗi xảy ra";
                 api.error({
                     message: "Thất Bại",
                     description: errorMessage,
@@ -111,55 +97,19 @@ export default function UpdateBrand({
                     <Form.Item label="ID thương hiệu" name="id">
                         <Input disabled />
                     </Form.Item>
-
-                    <Form.Item
-                        label="Tên thương hiệu"
-                        name="name"
-                        rules={[{ required: true, message: "Tên thương hiệu không được để trống" }]}
-                    >
+                    <Form.Item label="Tên thương hiệu" name="name" rules={[{ required: true, message: "Tên thương hiệu không được để trống" }]}>
                         <Input />
                     </Form.Item>
-
-                    <Form.Item label="Ảnh thương hiệu" name="imageBrand">
+                    <Form.Item label="Ảnh thương hiệu" name="image">
                         <div style={{ textAlign: "center", marginBottom: 12 }}>
-                            <label
-                                htmlFor="upload-brand"
-                                style={{
-                                    padding: "10px 20px",
-                                    background: "#1677ff",
-                                    color: "#fff",
-                                    borderRadius: 6,
-                                    cursor: "pointer",
-                                    display: "inline-block",
-                                }}
-                            >
+                            <label htmlFor="upload-brand" style={{ padding: "10px 20px", background: "#1677ff", color: "#fff", borderRadius: 6, cursor: "pointer", display: "inline-block" }}>
                                 <UploadOutlined /> Upload ảnh thương hiệu
                             </label>
-                            <input
-                                id="upload-brand"
-                                type="file"
-                                hidden
-                                accept="image/*"
-                                onChange={handleOnchangeFile}
-                            />
+                            <input id="upload-brand" type="file" hidden accept="image/*" onChange={handleOnchangeFile} />
                         </div>
-
                         {preview && (
-                            <div
-                                style={{
-                                    marginTop: 12,
-                                    height: 200,
-                                    border: "1px dashed #ccc",
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                }}
-                            >
-                                <img
-                                    src={preview}
-                                    alt="preview"
-                                    style={{ maxHeight: "100%", maxWidth: "100%" }}
-                                />
+                            <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+                                <img src={preview} alt="preview" style={{ maxHeight: 200, maxWidth: "100%", objectFit: "contain", borderRadius: 6 }} />
                             </div>
                         )}
                     </Form.Item>

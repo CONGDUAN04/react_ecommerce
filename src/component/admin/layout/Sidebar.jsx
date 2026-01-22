@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useCallback, useMemo, useContext } from 'react';
 import {
     Package, Users, Hexagon, ChevronRight, Menu, X,
-    Settings, LogOut, LayoutDashboard, Droplet, Database, Target,
-    Bell, MessageSquare, Search
+    LayoutDashboard, Droplet, Database, Target
 } from 'lucide-react';
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { logoutAPI } from '../../../services/api.services.js';
+import { Link, useLocation } from "react-router-dom";
 import { AuthContext } from '../../context/auth.context.jsx';
-import { NotifyContext } from '../../context/notify.context.jsx';
 
 const getActiveMenuFromPath = (path) => {
     const routeMap = {
@@ -30,7 +27,6 @@ const getActiveMenuFromPath = (path) => {
 export default function Sidebar({ isOpen, toggleSidebar }) {
     const location = useLocation();
     const { setUser } = useContext(AuthContext);
-    const { api } = useContext(NotifyContext);
 
     const initialActive = getActiveMenuFromPath(location.pathname);
     const [activeMenu, setActiveMenu] = useState(initialActive.menu);
@@ -54,32 +50,11 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
         { id: 'targets', label: 'Nhu cầu sử dụng', icon: Target, path: '/admin/targets' },
     ], []);
 
-    const bottomMenuItems = useMemo(() => [
-        { id: 'settings', label: 'Cài đặt', icon: Settings, path: '/settings' },
-        { id: 'logout', label: 'Logout', icon: LogOut },
-    ], []);
-
     useEffect(() => {
         const matched = getActiveMenuFromPath(location.pathname);
         setActiveMenu(matched.menu);
         setActiveSubMenu(matched.subMenu);
     }, [location.pathname]);
-
-    const handleLogout = useCallback(async () => {
-        try {
-            const res = await logoutAPI();
-            localStorage.removeItem("access_token");
-            localStorage.removeItem("user");
-            setUser(null);
-            api.success({
-                message: "Đăng xuất thành công",
-                description: res?.message || "Bạn đã đăng xuất khỏi hệ thống",
-                duration: 2,
-            });
-        } catch (error) {
-            api.error({ message: "Lỗi đăng xuất", description: error.message });
-        }
-    }, [setUser, api]);
 
     return (
         <aside className={`bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-r border-slate-700/30 flex flex-col sticky top-0 h-screen overflow-hidden transition-all duration-500 ease-in-out backdrop-blur-2xl ${isOpen ? 'w-72' : 'w-24'} md:relative md:z-auto fixed z-50 left-0 shadow-2xl`}>
@@ -201,37 +176,6 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                                     </div>
                                 )}
                             </div>
-                        );
-                    })}
-                </div>
-
-                {/* Bottom Menu */}
-                <div className="border-t border-slate-700/20 pt-3 mt-3 flex flex-col gap-1">
-                    {bottomMenuItems.map(item => {
-                        const Icon = item.icon;
-
-                        if (item.id === "logout") {
-                            return (
-                                <button
-                                    className="group flex items-center gap-3 px-4 py-3.5 rounded-xl cursor-pointer transition-all duration-300 text-sm font-medium text-slate-400 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 w-full text-left bg-transparent border border-transparent"
-                                    onClick={handleLogout}
-                                    key="logout"
-                                >
-                                    <Icon size={22} className="group-hover:scale-110 transition-transform" />
-                                    {isOpen && <span className="group-hover:text-red-300 transition-colors">{item.label}</span>}
-                                </button>
-                            );
-                        }
-
-                        return (
-                            <Link
-                                to={item.path}
-                                key={item.id}
-                                className="group flex items-center gap-3 px-4 py-3.5 rounded-xl cursor-pointer transition-all duration-300 text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 border border-transparent hover:border-slate-700/40"
-                            >
-                                <Icon size={22} className="group-hover:scale-110 transition-transform" />
-                                {isOpen && <span className="group-hover:text-blue-200 transition-colors">{item.label}</span>}
-                            </Link>
                         );
                     })}
                 </div>

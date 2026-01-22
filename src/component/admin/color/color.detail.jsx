@@ -15,28 +15,22 @@ const ColorDetail = ({ dataDetail, setDataDetail, openDetail, setOpenDetail }) =
             footer={null}
             width={720}
             centered
-            styles={{ body: { paddingBottom: 56 } }} // chừa chỗ cho info hệ thống
+            styles={{ body: { paddingBottom: 56 } }}
         >
             {!dataDetail ? (
                 <Empty />
             ) : (
                 <>
-                    <Descriptions
-                        column={1}
-                        bordered
-                        size="small"
-                        labelStyle={{ fontWeight: 600, width: 140 }}
-                    >
+                    <Descriptions column={1} bordered size="small" labelStyle={{ fontWeight: 600, width: 140 }}>
                         <Descriptions.Item label="ID">{dataDetail.id}</Descriptions.Item>
                         <Descriptions.Item label="Màu sắc">{dataDetail.color}</Descriptions.Item>
                         <Descriptions.Item label="Sản phẩm">{dataDetail.product?.name || "N/A"}</Descriptions.Item>
                     </Descriptions>
 
-                    {/* ===== Hình ảnh ===== */}
                     {dataDetail.image && (
                         <>
                             <Divider>Hình ảnh</Divider>
-                            <div style={{ textAlign: "center" }}>
+                            <div style={{ display: "flex", justifyContent: "center" }}>
                                 <img
                                     src={`${import.meta.env.VITE_BACKEND_URL}/images/color/${dataDetail.image}`}
                                     alt={dataDetail.color}
@@ -46,7 +40,6 @@ const ColorDetail = ({ dataDetail, setDataDetail, openDetail, setOpenDetail }) =
                         </>
                     )}
 
-                    {/* ===== Dung lượng ===== */}
                     <Divider>Dung lượng ({dataDetail.storages?.length || 0})</Divider>
 
                     {dataDetail.storages?.length > 0 ? (
@@ -69,7 +62,6 @@ const ColorDetail = ({ dataDetail, setDataDetail, openDetail, setOpenDetail }) =
                         <Empty description="Chưa có dung lượng nào" />
                     )}
 
-                    {/* ===== Thông tin hệ thống (góc phải) ===== */}
                     {dataDetail.createdAt && dataDetail.updatedAt && (
                         <div style={{ position: "absolute", right: 24, bottom: 16, fontSize: 14, color: "#999", textAlign: "right" }}>
                             <div>Tạo: {dayjs(dataDetail.createdAt).format("DD/MM/YYYY HH:mm")}</div>

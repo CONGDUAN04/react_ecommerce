@@ -7,19 +7,12 @@ const CategoryDetail = ({ dataDetail, setDataDetail, openDetail, setOpenDetail }
         setOpenDetail(false);
     };
 
-    if (!dataDetail) return (
-        <Modal
-            title="Chi tiết danh mục"
-            open={openDetail}
-            onCancel={handleClose}
-            footer={null}
-            width={600}
-            centered
-            maskClosable={false}
-        >
-            <Empty />
-        </Modal>
-    );
+    if (!dataDetail)
+        return (
+            <Modal title="Chi tiết danh mục" open={openDetail} onCancel={handleClose} footer={null} width={600} centered maskClosable={false}>
+                <Empty />
+            </Modal>
+        );
 
     return (
         <Modal
@@ -32,12 +25,7 @@ const CategoryDetail = ({ dataDetail, setDataDetail, openDetail, setOpenDetail }
             maskClosable={false}
             styles={{ body: { paddingBottom: 56 } }}
         >
-            <Descriptions
-                column={1}
-                bordered
-                size="small"
-                labelStyle={{ fontWeight: 600, width: 140 }}
-            >
+            <Descriptions column={1} bordered size="small" labelStyle={{ fontWeight: 600, width: 140 }}>
                 <Descriptions.Item label="ID">{dataDetail.id}</Descriptions.Item>
                 <Descriptions.Item label="Tên danh mục">{dataDetail.name}</Descriptions.Item>
                 <Descriptions.Item label="Mô tả">{dataDetail.description || "N/A"}</Descriptions.Item>
@@ -46,7 +34,7 @@ const CategoryDetail = ({ dataDetail, setDataDetail, openDetail, setOpenDetail }
             {dataDetail.image && (
                 <>
                     <Divider>Hình ảnh</Divider>
-                    <div style={{ textAlign: "center" }}>
+                    <div style={{ display: "flex", justifyContent: "center" }}>
                         <img
                             src={`${import.meta.env.VITE_BACKEND_URL}/images/category/${dataDetail.image}`}
                             alt={dataDetail.name}

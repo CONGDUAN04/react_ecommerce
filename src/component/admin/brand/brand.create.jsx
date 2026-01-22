@@ -13,19 +13,19 @@ import { NotifyContext } from "../../context/notify.context.jsx";
 export default function CreateBrandForm({ loadBrand }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
-    const [imageBrand, setImageBrand] = useState(null);
+    const [image, setImage] = useState(null);
     const [preview, setPreview] = useState(null);
     const { api } = useContext(NotifyContext);
     const { loading, setLoading } = useContext(LoadingContext);
 
     const handleOnchangeFile = (e) => {
         if (!e.target.files || e.target.files.length === 0) {
-            setImageBrand(null);
+            setImage(null);
             setPreview(null);
             return;
         }
         const file = e.target.files[0];
-        setImageBrand(file);
+        setImage(file);
         setPreview(URL.createObjectURL(file));
     };
 
@@ -34,7 +34,7 @@ export default function CreateBrandForm({ loadBrand }) {
             setLoading(true);
             const res = await createBrandAPI({
                 name: values.name,
-                imageBrand
+                image
             });
             api.success({
                 message: "Thành Công",
@@ -67,7 +67,7 @@ export default function CreateBrandForm({ loadBrand }) {
 
     const resetAndCloseModal = () => {
         form.resetFields();
-        setImageBrand(null);
+        setImage(null);
         setPreview(null);
         setIsModalOpen(false);
     };
@@ -124,7 +124,7 @@ export default function CreateBrandForm({ loadBrand }) {
 
                     <Form.Item
                         label="Ảnh thương hiệu"
-                        name="imageBrand"
+                        name="image"
                         rules={[{ required: true, message: "Vui lòng chọn ảnh thương hiệu" }]}
                     >
                         <div style={{ textAlign: "center", marginBottom: 12 }}>

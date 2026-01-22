@@ -1,17 +1,7 @@
-import {
-    Form,
-    Input,
-    Modal,
-    Select,
-} from "antd";
+import { Form, Input, Modal, Select } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useContext, useEffect, useState } from "react";
-import {
-    updateProductAPI,
-    fetchAllBrandsAPI,
-    fetchAllCategoriesAPI,
-    fetchAllTargetsAPI,
-} from "../../../services/api.services.js";
+import { updateProductAPI, fetchAllBrandsAPI, fetchAllCategoriesAPI, fetchAllTargetsAPI } from "../../../services/api.services.js";
 import { LoadingContext } from "../../context/loading.context.jsx";
 import { NotifyContext } from "../../context/notify.context.jsx";
 
@@ -29,7 +19,8 @@ export default function UpdateProductForm({
     const [preview, setPreview] = useState(null);
     const [file, setFile] = useState(null);
     const { api, contextHolder } = useContext(NotifyContext);
-    const { loading, setLoading } = useContext(LoadingContext)
+    const { loading, setLoading } = useContext(LoadingContext);
+
     useEffect(() => {
         const loadDropdownData = async () => {
             try {
@@ -42,7 +33,6 @@ export default function UpdateProductForm({
                 setCategories(c?.data || []);
                 setTargets(t?.data || []);
             } catch (error) {
-
                 api.error({
                     message: "Không thể tải dữ liệu",
                     description: error.message,
@@ -63,16 +53,13 @@ export default function UpdateProductForm({
             targetId: dataUpdate.targetId,
         });
         if (dataUpdate.thumbnail) {
-            setPreview(
-                `${import.meta.env.VITE_BACKEND_URL}/images/product/${dataUpdate.thumbnail}`
-            );
+            setPreview(`${import.meta.env.VITE_BACKEND_URL}/images/product/${dataUpdate.thumbnail}`);
         }
     }, [dataUpdate, form]);
 
     const handleOnchangeFile = (e) => {
         const selectedFile = e.target.files?.[0];
         if (!selectedFile) return;
-
         setFile(selectedFile);
         setPreview(URL.createObjectURL(selectedFile));
     };
@@ -98,9 +85,7 @@ export default function UpdateProductForm({
                 }));
                 form.setFields(formErrors);
             } else {
-                const errorMessage = error.response?.data?.message ||
-                    error.message ||
-                    "Đã có lỗi xảy ra";
+                const errorMessage = error.response?.data?.message || error.message || "Đã có lỗi xảy ra";
                 api.error({
                     message: "Thất Bại",
                     description: errorMessage,
@@ -135,97 +120,38 @@ export default function UpdateProductForm({
                 maskClosable={false}
                 width={600}
             >
-                <Form key={dataUpdate?.id}
-                    form={form} layout="vertical" onFinish={handleSubmit}>
+                <Form key={dataUpdate?.id} form={form} layout="vertical" onFinish={handleSubmit}>
                     <Form.Item label="ID" name="id">
                         <Input disabled />
                     </Form.Item>
-
-                    <Form.Item
-                        label="Tên sản phẩm"
-                        name="name"
-                        rules={[{ required: true, message: "Tên sản phẩm không được để trống" }]}
-                    >
+                    <Form.Item label="Tên sản phẩm" name="name" rules={[{ required: true, message: "Tên sản phẩm không được để trống" }]}>
                         <Input />
                     </Form.Item>
-
-                    <Form.Item label="Mô tả" name="description">
+                    <Form.Item label="Mô tả" name="desc">
                         <Input.TextArea rows={4} />
                     </Form.Item>
-
-                    <Form.Item
-                        label="Brand"
-                        name="brandId"
-                        rules={[{ required: true, message: "Chọn brand" }]}
-                    >
-                        <Select
-                            options={brands.map(b => ({
-                                label: b.name,
-                                value: b.id,
-                            }))}
-                        />
+                    <Form.Item label="Brand" name="brandId" rules={[{ required: true, message: "Chọn brand" }]}>
+                        <Select options={brands.map(b => ({ label: b.name, value: b.id }))} />
                     </Form.Item>
-
-                    <Form.Item
-                        label="Category"
-                        name="categoryId"
-                        rules={[{ required: true, message: "Chọn category" }]}
-                    >
-                        <Select
-                            options={categories.map(c => ({
-                                label: c.name,
-                                value: c.id,
-                            }))}
-                        />
+                    <Form.Item label="Category" name="categoryId" rules={[{ required: true, message: "Chọn category" }]}>
+                        <Select options={categories.map(c => ({ label: c.name, value: c.id }))} />
                     </Form.Item>
-
-                    <Form.Item
-                        label="Target"
-                        name="targetId"
-                        rules={[{ required: true, message: "Chọn target" }]}
-                    >
-                        <Select
-                            options={targets.map(t => ({
-                                label: t.name,
-                                value: t.id,
-                            }))}
-                        />
+                    <Form.Item label="Target" name="targetId" rules={[{ required: true, message: "Chọn target" }]}>
+                        <Select options={targets.map(t => ({ label: t.name, value: t.id }))} />
                     </Form.Item>
                     <Form.Item label="Ảnh sản phẩm" name="thumbnail" required>
                         <div style={{ textAlign: "center", marginBottom: 12 }}>
-                            <label
-                                htmlFor="upload"
-                                style={{
-                                    padding: "10px 20px",
-                                    background: "#1677ff",
-                                    color: "#fff",
-                                    borderRadius: 6,
-                                    cursor: "pointer",
-                                    display: "inline-block",
-                                }}
-                            >
+                            <label htmlFor="upload" style={{ padding: "10px 20px", background: "#1677ff", color: "#fff", borderRadius: 6, cursor: "pointer", display: "inline-block" }}>
                                 <UploadOutlined /> Upload ảnh sản phẩm
                             </label>
-                            <input
-                                id="upload"
-                                type="file"
-                                hidden
-                                accept="image/*"
-                                onChange={handleOnchangeFile}
-                            />
+                            <input id="upload" type="file" hidden accept="image/*" onChange={handleOnchangeFile} />
                         </div>
+                        {preview && (
+                            <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+                                <img src={preview} alt="preview" style={{ maxHeight: 200, maxWidth: "100%", objectFit: "contain", borderRadius: 6 }} />
+                            </div>
+                        )}
                     </Form.Item>
-
-
-                    {preview && (
-                        <div style={{ textAlign: "center" }}>
-                            <img
-                                src={preview}
-                                alt="preview"
-                                style={{ maxHeight: 200, objectFit: "contain" }}
-                            />
-                        </div>
-                    )}
                 </Form>
             </Modal>
         </>

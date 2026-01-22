@@ -93,6 +93,7 @@ export default function CreateStorageForm({ loadStorage }) {
                 open={isModalOpen}
                 onOk={() => form.submit()}
                 okText="Tạo mới"
+                maskClosable={false}
                 onCancel={() => {
                     form.resetFields();
                     setIsModalOpen(false);

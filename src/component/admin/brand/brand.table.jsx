@@ -52,7 +52,7 @@ export const BrandTable = (props) => {
         },
         {
             title: <div style={{ fontWeight: 600 }}>Hình ảnh</div>,
-            dataIndex: "imageBrand",
+            dataIndex: "image",
             width: 100,
             align: "center",
             render: (imageBrand, record) => (

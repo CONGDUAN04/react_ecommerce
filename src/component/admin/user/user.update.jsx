@@ -131,12 +131,11 @@ export default function UpdateUserForm({
                         <Input />
                     </Form.Item>
 
-
                     <Form.Item label="Phân quyền" name="roleId" rules={[{ required: true, message: "Role không được để trống" }]}>
                         <Select options={roles.map(r => ({ label: r.name, value: r.id }))} />
                     </Form.Item>
 
-                    <Form.Item label="Avatar" name="avatar">
+                    <Form.Item label="Avatar" name="avatar" required>
                         <div style={{ textAlign: "center", marginBottom: 12 }}>
                             <label
                                 htmlFor="upload"
@@ -149,15 +148,35 @@ export default function UpdateUserForm({
                                     display: "inline-block",
                                 }}
                             >
-                                <UploadOutlined /> Upload avatar
+                                <UploadOutlined /> Upload ảnh avatar
                             </label>
-                            <input id="upload" type="file" hidden accept="image/*" onChange={handleOnchangeFile} />
+                            <input
+                                id="upload"
+                                type="file"
+                                hidden
+                                accept="image/*"
+                                onChange={handleOnchangeFile}
+                            />
                         </div>
                     </Form.Item>
 
                     {preview && (
-                        <div style={{ textAlign: "center" }}>
-                            <img src={preview} alt="preview" style={{ maxHeight: 200, objectFit: "contain" }} />
+                        <div style={{
+                            textAlign: "center",
+                            display: "flex",
+                            justifyContent: "center",
+                            marginTop: 16
+                        }}>
+                            <img
+                                src={preview}
+                                alt="preview"
+                                style={{
+                                    maxHeight: 200,
+                                    maxWidth: "100%",
+                                    objectFit: "contain",
+                                    borderRadius: 6
+                                }}
+                            />
                         </div>
                     )}
                 </Form>
