@@ -1,16 +1,19 @@
 import React, { useState, useEffect, useCallback, useMemo, useContext } from 'react';
 import {
-    Package, Users, Hexagon, ChevronRight, Menu, X,
-    LayoutDashboard, Droplet, Database, Target
+    Package, Users, ChevronRight, Menu, X,
+    LayoutDashboard, Droplet, Target,
+    Tags,
+    BadgeCheck,
+    Boxes
 } from 'lucide-react';
 import { Link, useLocation } from "react-router-dom";
 import { AuthContext } from '../../context/auth.context.jsx';
 
 const getActiveMenuFromPath = (path) => {
     const routeMap = {
-        '/admin/products/colors': { menu: 'products', subMenu: 'colors' },
-        '/admin/products/storages': { menu: 'products', subMenu: 'storages' },
-        '/admin/products': { menu: 'products', subMenu: null },
+        '/admin/product-groups': { menu: 'product-groups', subMenu: null },
+        '/admin/products': { menu: 'product-groups', subMenu: 'products' },
+        '/admin/products/colors': { menu: 'product-groups', subMenu: 'colors' },
         '/admin/categories': { menu: 'categories', subMenu: null },
         '/admin/brands': { menu: 'brands', subMenu: null },
         '/admin/users': { menu: 'users', subMenu: null },
@@ -33,22 +36,63 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
     const [activeSubMenu, setActiveSubMenu] = useState(initialActive.subMenu);
 
     const menuItems = useMemo(() => [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
         {
-            id: 'products',
-            label: 'Sản phẩm',
-            icon: Package,
-            path: '/admin/products',
+            id: 'dashboard',
+            label: 'Dashboard',
+            icon: LayoutDashboard,
+            path: '/admin'
+        },
+
+        {
+            id: 'product-groups',
+            label: 'Nhóm sản phẩm',
+            icon: Boxes,
+            path: '/admin/product-groups',
             subMenu: [
-                { id: 'colors', label: 'Màu sắc', path: '/admin/products/colors', icon: Droplet },
-                { id: 'storages', label: 'Dung lượng', path: '/admin/products/storages', icon: Database }
+                {
+                    id: 'products',
+                    label: 'Sản phẩm',
+                    path: '/admin/products',
+                    icon: Package
+                },
+                {
+                    id: 'colors',
+                    label: 'Màu sắc',
+                    path: '/admin/products/colors',
+                    icon: Droplet
+                },
             ]
         },
-        { id: 'categories', label: 'Danh mục sản phẩm', icon: Package, path: '/admin/categories' },
-        { id: 'users', label: 'Người dùng', icon: Users, path: '/admin/users' },
-        { id: 'brands', label: 'Thương hiệu', icon: Hexagon, path: '/admin/brands' },
-        { id: 'targets', label: 'Nhu cầu sử dụng', icon: Target, path: '/admin/targets' },
+
+        {
+            id: 'categories',
+            label: 'Danh mục sản phẩm',
+            icon: Tags,
+            path: '/admin/categories'
+        },
+
+        {
+            id: 'users',
+            label: 'Người dùng',
+            icon: Users,
+            path: '/admin/users'
+        },
+
+        {
+            id: 'brands',
+            label: 'Thương hiệu',
+            icon: BadgeCheck,
+            path: '/admin/brands'
+        },
+
+        {
+            id: 'targets',
+            label: 'Nhu cầu sử dụng',
+            icon: Target,
+            path: '/admin/targets'
+        },
     ], []);
+
 
     useEffect(() => {
         const matched = getActiveMenuFromPath(location.pathname);
@@ -117,7 +161,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                                 <Link
                                     to={item.path}
                                     className={`group flex items-center gap-3 px-4 py-3.5 rounded-xl cursor-pointer transition-all duration-300 text-sm font-medium relative border overflow-hidden
-                                        ${isActive
+                                            ${isActive
                                             ? 'bg-gradient-to-r from-blue-500/30 to-cyan-500/15 text-white font-semibold border-blue-500/40 shadow-lg shadow-blue-500/20'
                                             : 'text-slate-400 hover:text-white border-transparent hover:bg-slate-800/50 hover:border-slate-700/40'
                                         }`}
@@ -157,7 +201,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                                                     to={sub.path}
                                                     key={sub.id}
                                                     className={`group px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-3 relative overflow-hidden border
-                                                        ${activeSub
+                                                            ${activeSub
                                                             ? 'bg-blue-500/20 text-blue-200 border-blue-500/30 shadow-md shadow-blue-500/15'
                                                             : 'text-slate-400 hover:text-white hover:bg-slate-800/40 border-transparent'
                                                         }`}

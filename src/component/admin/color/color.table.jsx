@@ -116,7 +116,50 @@ export const ColorTable = (props) => {
             ),
         },
         {
-            title: <div style={{ fontWeight: 600 }}>Sản phẩm</div>,
+            title: <div style={{ fontWeight: 600 }}>Số lượng tồn</div>,
+            dataIndex: "quantity",
+            width: 200,
+            align: "center",
+            render: (text) => (
+                <span style={{
+                    padding: "4px 14px",
+                    borderRadius: 999,
+                    fontWeight: 600,
+                    fontSize: 13,
+                    backgroundColor: "#fafafa",
+                    border: "1px solid #d9d9d9",
+                    color: "#262626",
+                }}>
+                    {text}
+                </span>
+            ),
+        },
+        {
+            title: <div style={{ fontWeight: 600 }}>Giá</div>,
+            dataIndex: "price",
+            width: 200,
+            align: "center",
+            render: (price) => {
+                const formatted = new Intl.NumberFormat("vi-VN").format(price);
+
+                return (
+                    <span style={{
+                        padding: "4px 14px",
+                        borderRadius: 999,
+                        fontWeight: 600,
+                        fontSize: 13,
+                        backgroundColor: "#fafafa",
+                        border: "1px solid #d9d9d9",
+                        color: "#262626",
+                    }}>
+                        {formatted}đ
+                    </span>
+                );
+            },
+        },
+
+        {
+            title: <div style={{ fontWeight: 600 }}>Phiên bản</div>,
             dataIndex: "product",
             width: 300,
             align: "center",

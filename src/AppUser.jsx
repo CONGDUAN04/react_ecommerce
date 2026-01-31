@@ -1,14 +1,19 @@
 import { Outlet } from "react-router-dom";
 import Header from "./component/client/Layout/Header.jsx";
 import { useContext } from "react";
-import { NotifyContext } from "./component/context/notify.context.jsx";
+import Footer from "./component/client/Layout/footer.jsx";
 
 const AppUser = () => {
     return (
-        <>
-            <Header />
-            <Outlet />
-        </>
+        <div className="bg-[#f6f7fb] min-h-screen flex flex-col">
+            <Header cartCount={2} />
+
+            <main className="flex-1">
+                <Outlet />
+            </main>
+
+            <Footer />
+        </div>
     );
 };
 

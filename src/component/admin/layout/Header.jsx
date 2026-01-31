@@ -12,17 +12,23 @@ function Header() {
     const { api } = useContext(NotifyContext);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const path = location.pathname;
-
+    const routes = [
+        ['/admin/product-groups', 'Nhóm sản phẩm'],
+        ['/admin/products', 'Danh sách sản phẩm'],
+        ['/admin/products/colors', 'Danh sách Sản phẩm / Màu sắc'],
+        ['/admin/categories', 'Danh mục sản phẩm'],
+        ['/admin/brands', 'Thương hiệu'],
+        ['/admin/users', 'Người dùng'],
+        ['/admin/targets', 'Nhu cầu sử dụng'],
+        ['/admin/settings', 'Cài đặt'],
+    ];
     const getPageTitle = () => {
         if (path === '/' || path === '/admin') return 'Dashboard';
-        if (path.startsWith('/admin/products/colors')) return 'Sản phẩm / Màu sắc';
-        if (path.startsWith('/admin/products/storages')) return 'Sản phẩm / Dung lượng';
-        if (path.startsWith('/admin/products')) return 'Sản phẩm';
-        if (path.startsWith('/admin/categories')) return 'Danh mục sản phẩm';
-        if (path.startsWith('/admin/brands')) return 'Thương hiệu';
-        if (path.startsWith('/admin/users')) return 'Người dùng';
-        if (path.startsWith('/admin/targets')) return 'Nhu cầu sử dụng';
-        if (path.startsWith('/admin/settings')) return 'Cài đặt';
+
+        for (const [route, title] of routes) {
+            if (path.startsWith(route)) return title;
+        }
+
         return 'Dashboard';
     };
 

@@ -1,10 +1,16 @@
-import { Modal, Descriptions, Divider, Card, Row, Col, Empty } from "antd";
+import { Modal, Descriptions, Divider, Empty, Tag } from "antd";
 import dayjs from "dayjs";
 
 const ColorDetail = ({ dataDetail, setDataDetail, openDetail, setOpenDetail }) => {
     const handleClose = () => {
         setDataDetail(null);
         setOpenDetail(false);
+    };
+
+    const renderStatus = () => {
+        if (dataDetail.quantity === 0) return <Tag color="red">Hết hàng</Tag>;
+        if (dataDetail.quantity < 5) return <Tag color="orange">Sắp hết</Tag>;
+        return <Tag color="green">Còn hàng</Tag>;
     };
 
     return (
@@ -21,53 +27,89 @@ const ColorDetail = ({ dataDetail, setDataDetail, openDetail, setOpenDetail }) =
                 <Empty />
             ) : (
                 <>
-                    <Descriptions column={1} bordered size="small" labelStyle={{ fontWeight: 600, width: 140 }}>
-                        <Descriptions.Item label="ID">{dataDetail.id}</Descriptions.Item>
-                        <Descriptions.Item label="Màu sắc">{dataDetail.color}</Descriptions.Item>
-                        <Descriptions.Item label="Sản phẩm">{dataDetail.product?.name || "N/A"}</Descriptions.Item>
+                    {/* ===== BASIC INFO ===== */}
+
+                    <Descriptions
+                        column={1}
+                        bordered
+                        size="small"
+                        labelStyle={{ fontWeight: 600, width: 140 }}
+                    >
+                        <Descriptions.Item label="ID">
+                            {dataDetail.id}
+                        </Descriptions.Item>
+
+                        <Descriptions.Item label="Màu sắc">
+                            {dataDetail.color}
+                        </Descriptions.Item>
+
+                        <Descriptions.Item label="Sản phẩm">
+                            {`${dataDetail.product?.productGroup?.name || ""} ${dataDetail.product?.name || ""}`}
+                        </Descriptions.Item>
+
+                        <Descriptions.Item label="Trạng thái">
+                            {renderStatus()}
+                        </Descriptions.Item>
                     </Descriptions>
+
+                    {/* ===== IMAGE ===== */}
 
                     {dataDetail.image && (
                         <>
                             <Divider>Hình ảnh</Divider>
+
                             <div style={{ display: "flex", justifyContent: "center" }}>
                                 <img
                                     src={`${import.meta.env.VITE_BACKEND_URL}/images/color/${dataDetail.image}`}
                                     alt={dataDetail.color}
-                                    style={{ maxHeight: 180, maxWidth: "100%", objectFit: "contain" }}
+                                    style={{
+                                        maxHeight: 180,
+                                        maxWidth: "100%",
+                                        objectFit: "contain"
+                                    }}
                                 />
                             </div>
                         </>
                     )}
 
-                    <Divider>Dung lượng ({dataDetail.storages?.length || 0})</Divider>
+                    {/* ===== SELL INFO ===== */}
 
-                    {dataDetail.storages?.length > 0 ? (
-                        <Row gutter={[16, 16]}>
-                            {dataDetail.storages.map((s) => (
-                                <Col key={s.id} xs={24} sm={12} md={8}>
-                                    <Card size="small" style={{ textAlign: "center" }}>
-                                        <div style={{ fontWeight: 600 }}>{s.name}</div>
-                                        <div style={{ color: "#d4380d", fontWeight: 600, margin: "4px 0" }}>
-                                            {s.price?.toLocaleString("vi-VN")}₫
-                                        </div>
-                                        <div style={{ fontSize: 12, color: "#888" }}>
-                                            Tồn: {s.quantity} · Bán: {s.sold || 0}
-                                        </div>
-                                    </Card>
-                                </Col>
-                            ))}
-                        </Row>
-                    ) : (
-                        <Empty description="Chưa có dung lượng nào" />
-                    )}
+                    <Divider>Thông tin bán</Divider>
 
-                    {dataDetail.createdAt && dataDetail.updatedAt && (
-                        <div style={{ position: "absolute", right: 24, bottom: 16, fontSize: 14, color: "#999", textAlign: "right" }}>
-                            <div>Tạo: {dayjs(dataDetail.createdAt).format("DD/MM/YYYY HH:mm")}</div>
-                            <div>Cập nhật: {dayjs(dataDetail.updatedAt).format("DD/MM/YYYY HH:mm")}</div>
+                    <Descriptions column={1} bordered size="small">
+                        <Descriptions.Item label="Giá">
+                            {dataDetail.price?.toLocaleString("vi-VN")}₫
+                        </Descriptions.Item>
+
+                        <Descriptions.Item label="Tồn kho">
+                            {dataDetail.quantity}
+                        </Descriptions.Item>
+
+                        <Descriptions.Item label="Đã bán">
+                            {dataDetail.sold || 0}
+                        </Descriptions.Item>
+                    </Descriptions>
+
+                    {/* ===== TIME ===== */}
+
+                    <div
+                        style={{
+                            position: "absolute",
+                            right: 24,
+                            bottom: 16,
+                            fontSize: 13,
+                            color: "#999",
+                            textAlign: "right"
+                        }}
+                    >
+                        <div>
+                            Tạo: {dayjs(dataDetail.createdAt).format("DD/MM/YYYY HH:mm")}
                         </div>
-                    )}
+
+                        <div>
+                            Cập nhật: {dayjs(dataDetail.updatedAt).format("DD/MM/YYYY HH:mm")}
+                        </div>
+                    </div>
                 </>
             )}
         </Modal>

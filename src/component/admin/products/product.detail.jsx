@@ -1,4 +1,4 @@
-import { Modal, Descriptions, Divider, Card, Row, Col, Empty, Typography } from "antd";
+import { Modal, Descriptions, Divider, Empty, Row, Col, Card, Tag } from "antd";
 import dayjs from "dayjs";
 
 const ProductDetail = ({ dataDetail, setDataDetail, openDetail, setOpenDetail }) => {
@@ -6,95 +6,91 @@ const ProductDetail = ({ dataDetail, setDataDetail, openDetail, setOpenDetail })
         setDataDetail(null);
         setOpenDetail(false);
     };
+
     return (
         <Modal
             title={<div style={{ textAlign: "center", fontWeight: 600 }}>Chi tiết sản phẩm</div>}
             open={openDetail}
             onCancel={handleClose}
             footer={null}
-            width={720}
+            width={760}
             centered
-            styles={{ body: { paddingBottom: 56 } }}
         >
             {!dataDetail ? (
                 <Empty />
             ) : (
                 <>
-                    <Descriptions column={1} bordered size="small" labelStyle={{ fontWeight: 600, width: 140 }}>
+                    <Descriptions column={1} bordered size="small" labelStyle={{ fontWeight: 600, width: 150 }}>
                         <Descriptions.Item label="ID">{dataDetail.id}</Descriptions.Item>
                         <Descriptions.Item label="Tên sản phẩm">{dataDetail.name}</Descriptions.Item>
-                        <Descriptions.Item label="Slug">
-                            <span style={{ color: "#555", fontFamily: "monospace" }}>
-                                {dataDetail.slug || "N/A"}
-                            </span>
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Thương hiệu">{dataDetail.brand?.name || "N/A"}</Descriptions.Item>
-                        <Descriptions.Item label="Danh mục">{dataDetail.category?.name || "N/A"}</Descriptions.Item>
-                        <Descriptions.Item label="Tồn kho">{dataDetail.quantity}</Descriptions.Item>
-                        <Descriptions.Item label="Đã bán">{dataDetail.sold || 0}</Descriptions.Item>
+                        <Descriptions.Item label="Slug">{dataDetail.slug}</Descriptions.Item>
+                        <Descriptions.Item label="Nhóm sản phẩm">{dataDetail.productGroup?.name}</Descriptions.Item>
+                        <Descriptions.Item label="Thương hiệu">{dataDetail.productGroup?.brand?.name}</Descriptions.Item>
+                        <Descriptions.Item label="Danh mục">{dataDetail.productGroup?.category?.name}</Descriptions.Item>
+                        <Descriptions.Item label="Tổng tồn kho">{dataDetail.quantity}</Descriptions.Item>
                         <Descriptions.Item label="Mô tả">{dataDetail.description || "N/A"}</Descriptions.Item>
                     </Descriptions>
 
-                    {!dataDetail.colors?.length && (
-                        <>
-                            <Divider>Hình ảnh</Divider>
-                            <div style={{ display: "flex", justifyContent: "center" }}>
-                                <img
-                                    src={
-                                        dataDetail.thumbnail
-                                            ? `${import.meta.env.VITE_BACKEND_URL}/images/product/${dataDetail.thumbnail}`
-                                            : "https://via.placeholder.com/300?text=No+Image"
-                                    }
-                                    alt={dataDetail.name}
-                                    style={{ maxHeight: 220, maxWidth: "100%", objectFit: "contain" }}
-                                />
-                            </div>
-                        </>
-                    )}
-
-                    <Divider>Biến thể ({dataDetail.colors?.length || 0})</Divider>
+                    <Divider>Màu sắc ({dataDetail.colors?.length || 0})</Divider>
 
                     {dataDetail.colors?.length > 0 ? (
-                        dataDetail.colors.map((color) => (
-                            <Card key={color.id} size="small" title={`Màu: ${color.color}`} style={{ marginBottom: 16 }}>
-                                <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
-                                    <img
-                                        src={
-                                            color.image
-                                                ? `${import.meta.env.VITE_BACKEND_URL}/images/color/${color.image}`
-                                                : "https://via.placeholder.com/150?text=No+Image"
-                                        }
-                                        alt={color.color}
-                                        style={{ maxHeight: 120, maxWidth: "100%", objectFit: "contain" }}
-                                    />
-                                </div>
+                        <Row gutter={[16, 16]} justify="center">
+                            {dataDetail.colors.map((c) => (
+                                <Col key={c.id} xs={12} sm={8} md={6}>
+                                    <Card
+                                        size="small"
+                                        hoverable
+                                        style={{
+                                            textAlign: "center",
+                                            height: "100%",
+                                            borderRadius: 12
+                                        }}
+                                    >
+                                        <img
+                                            src={`${import.meta.env.VITE_BACKEND_URL}/images/color/${c.image}`}
+                                            alt={c.color}
+                                            style={{
+                                                width: "100%",
+                                                height: 140,
+                                                objectFit: "contain",
+                                                marginBottom: 8
+                                            }}
+                                        />
 
-                                {color.storages?.length > 0 ? (
-                                    <Row gutter={[16, 16]}>
-                                        {color.storages.map((s) => (
-                                            <Col key={s.id} xs={24} sm={12} md={8}>
-                                                <Card size="small" hoverable style={{ textAlign: "center" }}>
-                                                    <div style={{ fontWeight: 600 }}>{s.name}</div>
-                                                    <div style={{ color: "#d4380d", fontWeight: 600, margin: "4px 0" }}>
-                                                        {s.price?.toLocaleString("vi-VN")}₫
-                                                    </div>
-                                                    <div style={{ fontSize: 12, color: "#888" }}>
-                                                        Tồn: {s.quantity} · Bán: {s.sold || 0}
-                                                    </div>
-                                                </Card>
-                                            </Col>
-                                        ))}
-                                    </Row>
-                                ) : (
-                                    <Empty description="Không có dung lượng" />
-                                )}
-                            </Card>
-                        ))
+                                        <div style={{ fontWeight: 600 }}>{c.color}</div>
+
+                                        <div style={{ color: "#d4380d", fontSize: 13 }}>
+                                            {c.price?.toLocaleString("vi-VN")}đ
+                                        </div>
+
+                                        <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
+                                            Tồn: {c.quantity} · Bán: {c.sold || 0}
+                                        </div>
+
+                                        {/* STATUS */}
+
+                                        <div style={{ marginTop: 6 }}>
+                                            {c.quantity === 0 && <Tag color="red">Hết hàng</Tag>}
+                                            {c.quantity > 0 && c.quantity < 5 && <Tag color="orange">Sắp hết</Tag>}
+                                            {c.quantity >= 5 && <Tag color="green">Còn hàng</Tag>}
+                                        </div>
+                                    </Card>
+                                </Col>
+                            ))}
+                        </Row>
                     ) : (
-                        <Empty description="Không có biến thể màu" />
+                        <Empty description="Chưa có màu nào" />
                     )}
 
-                    <div style={{ position: "absolute", right: 24, bottom: 16, fontSize: 14, color: "#999", textAlign: "right" }}>
+
+                    <div
+                        style={{
+                            marginTop: 16,
+                            fontSize: 13,
+                            color: "#999",
+                            textAlign: "right"
+                        }}
+                    >
                         <div>Tạo: {dayjs(dataDetail.createdAt).format("DD/MM/YYYY HH:mm")}</div>
                         <div>Cập nhật: {dayjs(dataDetail.updatedAt).format("DD/MM/YYYY HH:mm")}</div>
                     </div>

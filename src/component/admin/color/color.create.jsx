@@ -1,4 +1,4 @@
-import { Button, Form, Input, Modal } from "antd";
+import { Button, Form, Input, InputNumber, Modal } from "antd";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { useContext, useState } from "react";
 import { createColorAPI } from "../../../services/api.services.js";
@@ -10,53 +10,57 @@ export default function CreateColorForm({ loadColor }) {
     const [form] = Form.useForm();
     const [preview, setPreview] = useState(null);
     const [image, setImage] = useState(null);
+
     const { api } = useContext(NotifyContext);
     const { loading, setLoading } = useContext(LoadingContext);
 
-    // Upload ảnh
+    // upload ảnh
     const handleOnchangeFile = (e) => {
-        if (!e.target.files || e.target.files.length === 0) {
-            setImage(null);
-            setPreview(null);
-            return;
-        }
-        const file = e.target.files[0];
+        const file = e.target.files?.[0];
+        if (!file) return;
+
         setImage(file);
         setPreview(URL.createObjectURL(file));
     };
 
-    // Submit form
+    // submit
     const handleSubmitBtn = async (values) => {
+        if (!image) {
+            api.error({ message: "Vui lòng chọn ảnh" });
+            return;
+        }
+
         setLoading(true);
-        const { color, productId } = values;
+
         try {
             const res = await createColorAPI({
-                color,
-                productId,
-                image,
+                productId: values.productId,
+                color: values.color,
+                price: values.price,
+                image
             });
+
             api.success({
-                message: "Thành Công",
+                message: "Thành công",
                 description: res?.message,
-                duration: 3,
             });
+
             resetAndCloseModal();
-            await loadColor();
+            loadColor();
+
         } catch (error) {
-            if (error.response?.data?.errors && error.response.data.errors.length > 0) {
-                const formErrors = error.response.data.errors.map(err => ({
-                    name: err.field.replace('body.', ''),
+            if (error.errors?.length > 0) {
+                const formErrors = error.errors.map(err => ({
+                    name: err.field.replace("body.", ""),
                     errors: [err.message],
                 }));
+
+                console.log("Setting form errors:", formErrors);
                 form.setFields(formErrors);
             } else {
-                const errorMessage = error.response?.data?.message ||
-                    error.message ||
-                    "Đã có lỗi xảy ra";
                 api.error({
-                    message: "Thất Bại",
-                    description: errorMessage,
-                    duration: 3,
+                    message: "Thất bại",
+                    description: error.message || "Đã có lỗi xảy ra",
                 });
             }
         } finally {
@@ -98,50 +102,55 @@ export default function CreateColorForm({ loadColor }) {
             </div>
 
             <Modal
-                title={<div style={{ textAlign: "center" }}>Tạo màu sắc mới</div>}
+                title="Tạo màu sắc mới"
                 open={isModalOpen}
                 confirmLoading={loading}
                 onOk={() => form.submit()}
-                onCancel={resetAndCloseModal}
                 okText="Tạo mới"
-                cancelText="Hủy"
-                centered
+                onCancel={resetAndCloseModal}
                 maskClosable={false}
-                keyboard={false}
             >
-                <Form
-                    form={form}
-                    layout="vertical"
-                    onFinish={handleSubmitBtn}
-                >
+                <Form form={form} layout="vertical" onFinish={handleSubmitBtn}>
+
                     <Form.Item
-                        label="ID sản phẩm"
+                        label="Product ID"
                         name="productId"
-                        rules={[
-                            { required: true, message: "ID sản phẩm không được để trống" },
-                        ]}
+                        rules={[{ required: true, message: "Product ID không được để trống " }]}
                     >
-                        <Input placeholder="Nhập productId..." />
+                        <InputNumber
+                            style={{ width: "100%" }}
+                            min={0}
+                            placeholder="Nhập số 1 2 3 4" />
                     </Form.Item>
 
                     <Form.Item
                         label="Tên màu"
                         name="color"
-                        rules={[
-                            { required: true, message: "Tên màu không được để trống" },
-                        ]}
+                        rules={[{ required: true, message: "Tên màu không được để trống " }]}
                     >
-                        <Input placeholder="VD: Đỏ, Xanh, Đen..." />
+                        <Input placeholder="Xanh, Đỏ" />
                     </Form.Item>
 
                     <Form.Item
-                        label=" Ảnh màu sản phẩm"
-                        name="image"
-                        rules={[{ required: true, message: "Vui lòng chọn ảnh màu sản phẩm" }]}
+                        label="Giá"
+                        name="price"
+                        rules={[{ required: true, message: "Giá không được để trống" }]}
                     >
+                        <InputNumber
+                            style={{ width: "100%" }}
+                            min={0}
+                            placeholder="Nhập giá"
+                            formatter={(value) =>
+                                value ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") : ""
+                            }
+                            parser={(value) => value.replace(/\./g, "")}
+                        />
+                    </Form.Item>
+
+                    <Form.Item label="Ảnh màu sản phẩm" name="image" rules={[{ required: true, message: "Vui lòng chọn ảnh màu sản phẩm" }]}>
                         <div style={{ textAlign: "center", marginBottom: 12 }}>
                             <label
-                                htmlFor="upload-color"
+                                htmlFor="upload"
                                 style={{
                                     padding: "10px 20px",
                                     background: "#1677ff",
@@ -151,17 +160,16 @@ export default function CreateColorForm({ loadColor }) {
                                     display: "inline-block",
                                 }}
                             >
-                                <UploadOutlined /> Upload hình ảnh
+                                <UploadOutlined /> Upload ảnh màu sản phẩm
                             </label>
                             <input
-                                id="upload-color"
+                                id="upload"
                                 type="file"
                                 hidden
-                                accept="image/*"
+                                accept="Image/*"
                                 onChange={handleOnchangeFile}
                             />
                         </div>
-
                         {preview && (
                             <div
                                 style={{
@@ -176,11 +184,7 @@ export default function CreateColorForm({ loadColor }) {
                                 <img
                                     src={preview}
                                     alt="preview"
-                                    style={{
-                                        maxHeight: "100%",
-                                        maxWidth: "100%",
-                                        objectFit: "contain",
-                                    }}
+                                    style={{ maxHeight: "100%", maxWidth: "100%" }}
                                 />
                             </div>
                         )}

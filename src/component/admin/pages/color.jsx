@@ -6,12 +6,6 @@ import { ColorTable } from "../color/color.table";
 import { LoadingContext } from "../../context/loading.context";
 import CreateColorForm from "../color/color.create";
 
-const normalizeArray = (res) => {
-    if (!res?.data) return [];
-    if (Array.isArray(res.data)) return res.data;
-    if (Array.isArray(res.data.data)) return res.data.data;
-    return [];
-};
 
 const ColorPage = () => {
     const [dataColor, setDataColor] = useState([]);
@@ -24,8 +18,8 @@ const ColorPage = () => {
             setLoading(true);
             const res = await fetchAllColorAPI(current, pageSize);
             if (res?.ErrorCode === 0 && res?.data) {
-                setDataColor(res.data.items || []);
-                setTotal(res.data.pagination?.total || 0);
+                setDataColor(res.data.items);
+                setTotal(res.data.pagination.total);
             }
         } catch (error) {
             message.error("Không tải được danh sách màu");

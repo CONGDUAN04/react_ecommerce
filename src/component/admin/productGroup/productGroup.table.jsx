@@ -1,15 +1,15 @@
 import { DeleteOutlined, EditOutlined, EyeOutlined } from "@ant-design/icons";
-import { Table, Image, Button, Popconfirm, Tooltip } from "antd";
+import { Table, Button, Popconfirm, Tooltip } from "antd";
 import { useContext, useState } from "react";
-import ProductDetail from "./product.detail";
-import UpdateProductForm from "./product.update";
-import { deleteProductAPI } from "../../../services/api.services.js";
+import { deleteProductGroupAPI } from "../../../services/api.services.js";
 import { NotifyContext } from "../../context/notify.context.jsx";
-import ProductActiveToggle from "./product.active.toggle.jsx";
+import ProductGroupActiveToggle from "./productGroup.active.toggle.jsx";
+import ProductGroupDetail from "./productGroup.detail.jsx";
+import UpdateProductGroupForm from "./productGroup.update.jsx";
 
-const ProductTable = ({
-    dataProducts,
-    loadProducts,
+const ProductGroupTable = ({
+    dataGroups,
+    loadGroups,
     current,
     pageSize,
     total,
@@ -23,14 +23,14 @@ const ProductTable = ({
 
     const { api } = useContext(NotifyContext);
 
-    const handleDelete = async id => {
+    const handleDelete = async (id) => {
         try {
-            const res = await deleteProductAPI(id);
+            const res = await deleteProductGroupAPI(id);
             api.success({
                 message: "Thành công",
                 description: res?.message,
             });
-            loadProducts();
+            loadGroups();
         } catch (error) {
             api.error({
                 message: "Thất bại",
@@ -38,78 +38,82 @@ const ProductTable = ({
             });
         }
     };
-
     const columns = [
         {
-            title: "STT",
+            title: <div style={{ fontWeight: 600 }}>STT</div>,
             width: 60,
             align: "center",
-            render: (_, __, index) =>
-                (current - 1) * pageSize + index + 1,
-        },
-
-        {
-            title: "ID",
-            dataIndex: "id",
-            width: 70,
-            align: "center",
-            render: id => `#${id}`,
-        },
-
-        {
-            title: "Hình ảnh",
-            dataIndex: "thumbnail",
-            width: 100,
-            align: "center",
-            render: (thumbnail, record) => (
-                <Image
-                    style={{
-                        maxWidth: 60,
-                        maxHeight: 60,
-                        objectFit: "contain",
-                        borderRadius: 12,
-                    }}
-                    src={
-                        thumbnail
-                            ? `${import.meta.env.VITE_BACKEND_URL}/images/product/${thumbnail}`
-                            : null
-                    }
-                    alt={record.name}
-                    fallback="https://via.placeholder.com/60"
-                />
+            render: (_, __, index) => (
+                <span style={{ fontWeight: 500, color: "#8c8c8c" }}>
+                    {(current - 1) * pageSize + index + 1}
+                </span>
             ),
         },
         {
-            title: "Sản phẩm",
+            title: <div style={{ fontWeight: 600 }}>ID</div>,
+            dataIndex: "id",
+            width: 70,
             align: "center",
-            render: (_, record) =>
-                `${record.productGroup?.name || ""} ${record.name}`,
+            render: (id) => (
+                <span style={{ color: "#1677ff", fontWeight: 600, fontSize: 13 }}>
+                    #{id}
+                </span>
+            ),
         },
-
-
         {
-            title: "Phiên bản",
+            title: <div style={{ fontWeight: 600 }}>Tên nhóm</div>,
             dataIndex: "name",
             align: "center",
+            render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>,
         },
-
         {
-            title: "Dòng máy",
+            title: <div style={{ fontWeight: 600 }}>Danh mục</div>,
+            dataIndex: ["category", "name"],
             align: "center",
-            render: (_, record) => record.productGroup?.name || "-",
+            render: (name) => (
+                <span
+                    style={{
+                        padding: "4px 12px",
+                        borderRadius: 12,
+                        fontSize: 13,
+                        fontWeight: 500,
+                        backgroundColor: "#f0f5ff",
+                        color: "#2f54eb",
+                        border: "1px solid #adc6ff",
+                    }}
+                >
+                    {name}
+                </span>
+            ),
         },
         {
-            title: "Tổng tồn kho",
-            dataIndex: "quantity",
+            title: <div style={{ fontWeight: 600 }}>Thương Hiệu</div>,
+            dataIndex: ["brand", "name"],
             align: "center",
+            render: (name) => (
+                <span
+                    style={{
+                        padding: "4px 12px",
+                        borderRadius: 12,
+                        fontSize: 13,
+                        fontWeight: 500,
+                        backgroundColor: "#f0f5ff",
+                        color: "#2f54eb",
+                        border: "1px solid #adc6ff",
+                    }}
+                >
+                    {name}
+                </span>
+            ),
         },
-
-
         {
-            title: "Trạng thái",
+            title: <div style={{ fontWeight: 600 }}>Trạng thái</div>,
             align: "center",
             render: (_, record) => (
-                <ProductActiveToggle record={record} loadProducts={loadProducts} />
+                <ProductGroupActiveToggle
+                    record={record}
+                    loadGroups={loadGroups}
+                />
             ),
         },
         {
@@ -193,7 +197,6 @@ const ProductTable = ({
             ),
         },
     ];
-
     return (
         <>
             <div
@@ -206,7 +209,7 @@ const ProductTable = ({
             >
                 <Table
                     columns={columns}
-                    dataSource={dataProducts}
+                    dataSource={dataGroups}
                     rowKey="id"
                     pagination={{
                         current,
@@ -217,28 +220,28 @@ const ProductTable = ({
                             setCurrent(page);
                             setPageSize(size);
                         },
-                        showTotal: (t) => `Tổng ${t} sản phẩm`,
+                        showTotal: (t) => `Tổng ${t} nhóm sản phẩm`,
                     }}
                     scroll={{ x: 1200 }}
                 />
             </div>
 
-            <ProductDetail
+            <ProductGroupDetail
                 openDetail={openDetail}
                 setOpenDetail={setOpenDetail}
                 dataDetail={dataDetail}
                 setDataDetail={setDataDetail}
             />
 
-            <UpdateProductForm
+            <UpdateProductGroupForm
                 openUpdate={openUpdate}
                 setOpenUpdate={setOpenUpdate}
                 dataUpdate={dataUpdate}
                 setDataUpdate={setDataUpdate}
-                loadProducts={loadProducts}
+                loadGroups={loadGroups}
             />
         </>
     );
 };
 
-export default ProductTable;
+export default ProductGroupTable;

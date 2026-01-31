@@ -1,205 +1,13 @@
 import axios from "./axios.customize";
 
-//////////////////// CREATE ////////////////////
+//////////////////// HELPERS ////////////////////
 
-export const createUserAPI = (data) => {
+const buildFormData = (data) => {
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
         if (value !== undefined) formData.append(key, value);
     });
-    return axios.post("/api/admin/users", formData);
-};
-
-export const createProductAPI = (data) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined) formData.append(key, value);
-    });
-    return axios.post("/api/admin/products", formData);
-};
-
-export const createBrandAPI = async (data) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined) formData.append(key, value);
-    });
-    return axios.post("/api/admin/brands", formData);
-};
-
-export const createCategoryAPI = async (data) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined) formData.append(key, value);
-    });
-    return axios.post("/api/admin/categories", formData);
-};
-export const createTargetAPI = (data) => {
-    return axios.post("/api/admin/targets", data);
-}
-export const createColorAPI = (data) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined) formData.append(key, value);
-    });
-    return axios.post("/api/admin/colors", formData);
-};
-
-export const createStoragesAPI = ({ colorId, storages }) => {
-    return axios.post("/api/admin/storages", {
-        colorId: colorId,  // Gửi string, để Zod tự validate và transform
-        storages: storages.map(s => ({
-            sku: s.sku,
-            name: s.name,
-            price: s.price,
-            quantity: s.quantity,
-        })),
-    });
-};
-
-export const registerUserAPI = (data) =>
-    axios.post("/api/register", data);
-
-//////////////////// UPDATE ////////////////////
-
-export const updateUserAPI = (userId, data) => {
-    if (!userId) throw new Error("userId is required");
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined) formData.append(key, value);
-    });
-    return axios.put(`/api/admin/users/${userId}`, formData);
-};
-
-export const updateProfileAPI = (data) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined) formData.append(key, value);
-    });
-    return axios.patch("/api/user/update-profile", formData);
-};
-
-export const updateProductAPI = (productId, data) => {
-    if (!productId) throw new Error("productId is required");
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined) formData.append(key, value);
-    });
-    return axios.put(`/api/admin/products/${productId}`, formData);
-};
-
-export const updateBrandAPI = (brandId, data) => {
-    if (!brandId) throw new Error("brandId is required");
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined) formData.append(key, value);
-    });
-    return axios.put(`/api/admin/brands/${brandId}`, formData);
-};
-
-export const updateCategoryAPI = (categoryId, data) => {
-    if (!categoryId) throw new Error("categoryId is required");
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined) formData.append(key, value);
-    });
-    return axios.put(`/api/admin/categories/${categoryId}`, formData);
-};
-
-export const updateColorAPI = (colorId, data) => {
-    if (!colorId) throw new Error("colorId is required");
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined) formData.append(key, value);
-    });
-    return axios.put(`/api/admin/colors/${colorId}`, formData);
-};
-export const updateTargetAPI = (id, data) => {
-    return axios.put(`/api/admin/targets/${id}`, data);
-};
-export const updateStorageAPI = (storageId, data) => {
-    if (!storageId) throw new Error("storageId is required");
-    return axios.put(`/api/admin/storages/${storageId}`, data);
-};
-
-//////////////////// DELETE ////////////////////
-export const deleteTargetAPI = (id) => {
-    return axios.delete(`/api/admin/targets/${id}`);
-};
-
-export const deleteUserAPI = (userId) => {
-    if (!userId) throw new Error("userId is required");
-    return axios.delete(`/api/admin/users/${userId}`);
-};
-
-export const deleteProductAPI = (productId) => {
-    if (!productId) throw new Error("productId is required");
-    return axios.delete(`/api/admin/products/${productId}`);
-};
-
-export const deleteBrandAPI = (brandId) => {
-    if (!brandId) throw new Error("brandId is required");
-    return axios.delete(`/api/admin/brands/${brandId}`);
-};
-
-export const deleteCategoryAPI = (categoryId) => {
-    if (!categoryId) throw new Error("categoryId is required");
-    return axios.delete(`/api/admin/categories/${categoryId}`);
-};
-
-export const deleteColorAPI = (colorId) => {
-    if (!colorId) throw new Error("colorId is required");
-    return axios.delete(`/api/admin/colors/${colorId}`);
-};
-
-export const deleteStorageAPI = (storageId) => {
-    if (!storageId) throw new Error("storageId is required");
-    return axios.delete(`/api/admin/storages/${storageId}`);
-};
-
-//////////////////// FETCH ////////////////////
-
-export const fetchAllDashboardAPI = () =>
-    axios.get("/api/admin/dashboard");
-
-export const fetchAllUserAPI = () =>
-    axios.get("/api/admin/users");
-
-export const fetchAllRolesAPI = () =>
-    axios.get("/api/admin/roles");
-
-export const fetchProductsAPI = (page, limit) =>
-    axios.get(`/api/admin/products?page=${page}&limit=${limit}`);
-
-export const fetchAllBrandsAPI = (page, limit) => {
-    const params = {};
-    if (page != null) params.page = page;
-    if (limit != null) params.limit = limit;
-    return axios.get('/api/admin/brands', { params });
-};
-
-export const fetchAllCategoriesAPI = (page, limit) => {
-    const params = {};
-    if (page != null) params.page = page;
-    if (limit != null) params.limit = limit;
-    return axios.get('/api/admin/categories', { params });
-};
-
-export const fetchAllTargetsAPI = (page, limit) => {
-    const params = {};
-    if (page != null) params.page = page;
-    if (limit != null) params.limit = limit;
-    return axios.get('/api/admin/targets', { params });
-};
-export const fetchAllColorAPI = (page, limit) =>
-    axios.get(`/api/admin/colors?page=${page}&limit=${limit}`);
-
-export const fetchAllStoragesAPI = (page, limit) =>
-    axios.get(`/api/admin/storages?page=${page}&limit=${limit}`);
-export const getAccountAPI = () => {
-    const token = localStorage.getItem("access_token");
-    return axios.get("/api/account", {
-        headers: { Authorization: `Bearer ${token}` },
-    });
+    return formData;
 };
 
 //////////////////// AUTH ////////////////////
@@ -210,5 +18,152 @@ export const loginUserAPI = (email, password) =>
         password,
     });
 
+export const registerUserAPI = (data) =>
+    axios.post("/api/register", data);
+
 export const logoutAPI = () =>
     axios.post("/api/logout");
+
+//////////////////// ACCOUNT ////////////////////
+
+export const getAccountAPI = () => {
+    const token = localStorage.getItem("access_token");
+    return axios.get("/api/account", {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+};
+
+export const updateProfileAPI = (data) =>
+    axios.patch("/api/user/update-profile", buildFormData(data));
+
+//////////////////// USER ////////////////////
+
+export const fetchAllUserAPI = () =>
+    axios.get("/api/admin/users");
+
+export const createUserAPI = (data) =>
+    axios.post("/api/admin/users", buildFormData(data));
+
+export const updateUserAPI = (userId, data) => {
+    if (!userId) throw new Error("userId is required");
+    return axios.put(`/api/admin/users/${userId}`, buildFormData(data));
+};
+
+export const deleteUserAPI = (userId) => {
+    if (!userId) throw new Error("userId is required");
+    return axios.delete(`/api/admin/users/${userId}`);
+};
+
+export const fetchAllRolesAPI = () =>
+    axios.get("/api/admin/roles");
+
+
+//////////////////// BRAND ////////////////////
+
+export const fetchAllBrandsAPI = (page, limit) =>
+    axios.get("/api/admin/brands", { params: { page, limit } });
+
+export const createBrandAPI = (data) =>
+    axios.post("/api/admin/brands", buildFormData(data));
+
+export const updateBrandAPI = (brandId, data) => {
+    if (!brandId) throw new Error("brandId is required");
+    return axios.put(`/api/admin/brands/${brandId}`, buildFormData(data));
+};
+
+export const deleteBrandAPI = (brandId) => {
+    if (!brandId) throw new Error("brandId is required");
+    return axios.delete(`/api/admin/brands/${brandId}`);
+};
+
+//////////////////// CATEGORY ////////////////////
+
+export const fetchAllCategoriesAPI = (page, limit) =>
+    axios.get("/api/admin/categories", { params: { page, limit } });
+
+export const createCategoryAPI = (data) =>
+    axios.post("/api/admin/categories", buildFormData(data));
+
+export const updateCategoryAPI = (categoryId, data) => {
+    if (!categoryId) throw new Error("categoryId is required");
+    return axios.put(`/api/admin/categories/${categoryId}`, buildFormData(data));
+};
+
+export const deleteCategoryAPI = (categoryId) => {
+    if (!categoryId) throw new Error("categoryId is required");
+    return axios.delete(`/api/admin/categories/${categoryId}`);
+};
+
+//////////////////// COLOR ////////////////////
+
+export const fetchAllColorAPI = (page, limit) =>
+    axios.get(`/api/admin/colors?page=${page}&limit=${limit}`);
+
+export const createColorAPI = (data) =>
+    axios.post("/api/admin/colors", buildFormData(data));
+
+export const updateColorAPI = (colorId, data) => {
+    if (!colorId) throw new Error("colorId is required");
+    return axios.put(`/api/admin/colors/${colorId}`, buildFormData(data));
+};
+
+export const deleteColorAPI = (colorId) => {
+    if (!colorId) throw new Error("colorId is required");
+    return axios.delete(`/api/admin/colors/${colorId}`);
+};
+
+
+//////////////////// TARGET ////////////////////
+
+export const fetchAllTargetsAPI = (page, limit) =>
+    axios.get("/api/admin/targets", { params: { page, limit } });
+
+export const createTargetAPI = (data) =>
+    axios.post("/api/admin/targets", data);
+
+export const updateTargetAPI = (id, data) =>
+    axios.put(`/api/admin/targets/${id}`, data);
+
+export const deleteTargetAPI = (id) =>
+    axios.delete(`/api/admin/targets/${id}`);
+
+//////////////////// PRODUCT GROUP ////////////////////
+
+export const fetchProductGroupsAPI = (page, limit) =>
+    axios.get(`/api/admin/product-groups?page=${page}&limit=${limit}`);
+
+export const createProductGroupAPI = (data) =>
+    axios.post("/api/admin/product-groups", data);
+
+export const updateProductGroupAPI = (id, data) =>
+    axios.put(`/api/admin/product-groups/${id}`, data);
+
+export const deleteProductGroupAPI = (id) =>
+    axios.delete(`/api/admin/product-groups/${id}`);
+
+//////////////////// PRODUCT ////////////////////
+
+export const getHomeProductsAPI = () =>
+    axios.get("/");
+
+export const fetchProductsAPI = (page, limit) =>
+    axios.get(`/api/admin/products?page=${page}&limit=${limit}`);
+
+export const createProductAPI = (data) => {
+    const res = axios.post("/api/admin/products", buildFormData(data));
+    return res
+
+}
+export const updateProductAPI = (productId, data) => {
+    if (!productId) throw new Error("productId is required");
+    return axios.put(`/api/admin/products/${productId}`, buildFormData(data));
+};
+
+export const deleteProductAPI = (productId) => {
+    if (!productId) throw new Error("productId is required");
+    return axios.delete(`/api/admin/products/${productId}`);
+};
+//////////////////// DASHBOARD ////////////////////
+
+export const fetchAllDashboardAPI = () =>
+    axios.get("/api/admin/dashboard");

@@ -1,44 +1,47 @@
-// src/component/admin/pages/product.jsx
 import { useEffect, useState, useContext } from "react";
-import ProductTable from "../products/product.table";
-import CreateProductForm from "../products/product.create";
-import { message } from "antd";
 import AdminLayout from "../layout/AdminLayout";
+
+import { fetchProductGroupsAPI } from "../../../services/api.services.js";
 import { LoadingContext } from "../../context/loading.context.jsx";
-import { fetchProductsAPI } from "../../../services/api.services.js";
-const ProductPage = () => {
-    const [dataProducts, setDataProducts] = useState([]);
+import { message } from "antd";
+import CreateProductGroupForm from "../productGroup/productGroup.create.jsx";
+import ProductGroupTable from "../productGroup/productGroup.table.jsx";
+
+const ProductGroupPage = () => {
+    const [dataGroups, setDataGroups] = useState([]);
     const [current, setCurrent] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [total, setTotal] = useState(0);
 
     const { setLoading } = useContext(LoadingContext);
+
     useEffect(() => {
-        loadProducts();
+        loadGroups();
     }, [current, pageSize]);
 
-    const loadProducts = async () => {
+    const loadGroups = async () => {
         try {
             setLoading(true);
-            const res = await fetchProductsAPI(current, pageSize);
-
+            const res = await fetchProductGroupsAPI(current, pageSize);
             if (res?.ErrorCode === 0) {
-                setDataProducts(res.data || []);
+                setDataGroups(res.data || []);
                 setTotal(res.pagination?.total || 0);
             }
-        } catch (error) {
-            message.error("Lỗi khi tải danh sách sản phẩm");
+        } catch {
+            message.error("Lỗi tải nhóm sản phẩm");
         } finally {
             setLoading(false);
         }
     };
+
     return (
         <>
-            <CreateProductForm loadProducts={loadProducts} />
+            <CreateProductGroupForm loadGroups={loadGroups} />
+
             <AdminLayout>
-                <ProductTable
-                    dataProducts={dataProducts}
-                    loadProducts={loadProducts}
+                <ProductGroupTable
+                    dataGroups={dataGroups}
+                    loadGroups={loadGroups}
                     current={current}
                     pageSize={pageSize}
                     total={total}
@@ -50,4 +53,4 @@ const ProductPage = () => {
     );
 };
 
-export default ProductPage;
+export default ProductGroupPage;

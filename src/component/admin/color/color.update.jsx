@@ -1,4 +1,4 @@
-import { Form, Input, Modal } from "antd";
+import { Form, Input, InputNumber, Modal } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useContext, useEffect, useState } from "react";
 import { updateColorAPI } from "../../../services/api.services.js";
@@ -22,7 +22,10 @@ export default function UpdateColorForm({
         if (!dataUpdate) return;
         form.setFieldsValue({
             id: dataUpdate.id,
+            productId: dataUpdate.productId,
             color: dataUpdate.color,
+            price: dataUpdate.price
+
         });
         if (dataUpdate.image) {
             setPreview(`${import.meta.env.VITE_BACKEND_URL}/images/color/${dataUpdate.image}`);
@@ -50,18 +53,18 @@ export default function UpdateColorForm({
             resetAndClose();
             await loadColor();
         } catch (error) {
-            if (error.response?.data?.errors && error.response.data.errors.length > 0) {
-                const formErrors = error.response.data.errors.map(err => ({
-                    name: err.field.replace('body.', ''),
+            if (error.errors?.length > 0) {
+                const formErrors = error.errors.map(err => ({
+                    name: err.field.replace("body.", ""),
                     errors: [err.message],
                 }));
+
+                console.log("Setting form errors:", formErrors);
                 form.setFields(formErrors);
             } else {
-                const errorMessage = error.response?.data?.message || error.message || "Đã có lỗi xảy ra";
                 api.error({
-                    message: "Thất Bại",
-                    description: errorMessage,
-                    duration: 3,
+                    message: "Thất bại",
+                    description: error.message || "Đã có lỗi xảy ra",
                 });
             }
         } finally {
@@ -95,8 +98,22 @@ export default function UpdateColorForm({
                     <Form.Item label="ID màu sản phẩm" name="id">
                         <Input disabled />
                     </Form.Item>
+                    <Form.Item label="productId" name="productId" >
+                        <Input disabled />
+                    </Form.Item>
                     <Form.Item label="Tên màu" name="color" rules={[{ required: true, message: "Tên màu không được để trống " }]}>
                         <Input />
+                    </Form.Item>
+                    <Form.Item label="Giá" name="price" rules={[{ required: true, message: "Giá không được để trống" }]}>
+                        <InputNumber
+                            style={{ width: "100%" }}
+                            min={0}
+                            placeholder="Nhập giá"
+                            formatter={(value) =>
+                                value ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") : ""
+                            }
+                            parser={(value) => value.replace(/\./g, "")}
+                        />
                     </Form.Item>
                     <Form.Item label="Ảnh màu sắc" name="image" required>
                         <div style={{ textAlign: "center", marginBottom: 12 }}>

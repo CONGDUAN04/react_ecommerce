@@ -116,7 +116,7 @@ export default function CreateCategoryForm({ loadCategory }) {
                     <Form.Item
                         label="Tên danh mục"
                         name="name"
-                        rules={[{ required: true, message: "Tên danh mục không được để trống" }]}
+                    // rules={[{ required: true, message: "Tên danh mục không được để trống" }]}
                     >
                         <Input placeholder="Nhập tên danh mục..." />
                     </Form.Item>
