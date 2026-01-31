@@ -113,19 +113,6 @@ export const deleteColorAPI = (colorId) => {
 };
 
 
-//////////////////// TARGET ////////////////////
-
-export const fetchAllTargetsAPI = (page, limit) =>
-    axios.get("/api/admin/targets", { params: { page, limit } });
-
-export const createTargetAPI = (data) =>
-    axios.post("/api/admin/targets", data);
-
-export const updateTargetAPI = (id, data) =>
-    axios.put(`/api/admin/targets/${id}`, data);
-
-export const deleteTargetAPI = (id) =>
-    axios.delete(`/api/admin/targets/${id}`);
 
 //////////////////// PRODUCT GROUP ////////////////////
 

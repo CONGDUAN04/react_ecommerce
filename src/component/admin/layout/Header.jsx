@@ -14,14 +14,14 @@ function Header() {
     const path = location.pathname;
     const routes = [
         ['/admin/product-groups', 'Nhóm sản phẩm'],
-        ['/admin/products', 'Danh sách sản phẩm'],
-        ['/admin/products/colors', 'Danh sách Sản phẩm / Màu sắc'],
-        ['/admin/categories', 'Danh mục sản phẩm'],
+        ['/admin/products/colors', 'Sản phẩm / Màu sắc'],
+        ['/admin/products', 'Sản phẩm'],
+        ['/admin/categories', 'Danh mục'],
         ['/admin/brands', 'Thương hiệu'],
         ['/admin/users', 'Người dùng'],
-        ['/admin/targets', 'Nhu cầu sử dụng'],
         ['/admin/settings', 'Cài đặt'],
     ];
+
     const getPageTitle = () => {
         if (path === '/' || path === '/admin') return 'Dashboard';
 
@@ -44,7 +44,7 @@ function Header() {
                 duration: 2,
             });
             setTimeout(() => {
-                navigate('/login');
+                navigate('/');
             }, 500);
         } catch (error) {
             api.error({

@@ -51,20 +51,18 @@ export default function CreateCategoryForm({ loadCategory }) {
             resetAndCloseModal();
             await loadCategory();
         } catch (error) {
-            if (error.response?.data?.errors && error.response.data.errors.length > 0) {
-                const formErrors = error.response.data.errors.map(err => ({
-                    name: err.field.replace('body.', ''),
+            if (error.errors?.length > 0) {
+                const formErrors = error.errors.map(err => ({
+                    name: err.field.replace("body.", ""),
                     errors: [err.message],
                 }));
+
+                console.log("Setting form errors:", formErrors);
                 form.setFields(formErrors);
             } else {
-                const errorMessage = error.response?.data?.message ||
-                    error.message ||
-                    "Đã có lỗi xảy ra";
                 api.error({
-                    message: "Thất Bại",
-                    description: errorMessage,
-                    duration: 3,
+                    message: "Thất bại",
+                    description: error.message || "Đã có lỗi xảy ra",
                 });
             }
         } finally {
@@ -116,14 +114,13 @@ export default function CreateCategoryForm({ loadCategory }) {
                     <Form.Item
                         label="Tên danh mục"
                         name="name"
-                    // rules={[{ required: true, message: "Tên danh mục không được để trống" }]}
+                        rules={[{ required: true, message: "Tên danh mục không được để trống" }]}
                     >
                         <Input placeholder="Nhập tên danh mục..." />
                     </Form.Item>
                     <Form.Item
                         label="Mô tả"
                         name="description"
-                        required
                     >
                         <Input.TextArea rows={4} placeholder="Nhập mô tả danh mục..." />
                     </Form.Item>

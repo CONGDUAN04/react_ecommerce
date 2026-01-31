@@ -50,18 +50,18 @@ export default function UpdateCategoryForm({
             resetAndClose();
             await loadCategory();
         } catch (error) {
-            if (error.response?.data?.errors && error.response.data.errors.length > 0) {
-                const formErrors = error.response.data.errors.map(err => ({
-                    name: err.field.replace('body.', ''),
+            if (error.errors?.length > 0) {
+                const formErrors = error.errors.map(err => ({
+                    name: err.field.replace("body.", ""),
                     errors: [err.message],
                 }));
+
+                console.log("Setting form errors:", formErrors);
                 form.setFields(formErrors);
             } else {
-                const errorMessage = error.response?.data?.message || error.message || "Đã có lỗi xảy ra";
                 api.error({
-                    message: "Thất Bại",
-                    description: errorMessage,
-                    duration: 3,
+                    message: "Thất bại",
+                    description: error.message || "Đã có lỗi xảy ra",
                 });
             }
         } finally {

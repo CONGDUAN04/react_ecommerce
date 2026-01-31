@@ -84,13 +84,6 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
             icon: BadgeCheck,
             path: '/admin/brands'
         },
-
-        {
-            id: 'targets',
-            label: 'Nhu cầu sử dụng',
-            icon: Target,
-            path: '/admin/targets'
-        },
     ], []);
 
 

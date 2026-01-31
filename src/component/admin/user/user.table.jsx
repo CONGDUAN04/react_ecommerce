@@ -92,6 +92,27 @@ export const UserTable = (props) => {
             ),
         },
         {
+            title: <div style={{ fontWeight: 600 }}>Họ và tên</div>,
+            dataIndex: "fullName",
+            align: "center",
+            render: (fullName) => (
+                <span
+                    style={{
+                        padding: "4px 12px",
+                        borderRadius: 12,
+                        fontSize: 13,
+                        fontWeight: 500,
+                        backgroundColor: "#f0f5ff",
+                        color: "#2f54eb",
+                        border: "1px solid #adc6ff",
+                    }}
+                >
+                    {fullName}
+                </span>
+            ),
+        },
+
+        {
             title: <div style={{ fontWeight: 600 }}>Email</div>,
             dataIndex: "username",
             width: 280,

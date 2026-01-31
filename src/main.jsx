@@ -12,8 +12,6 @@ import BrandPage from './component/admin/pages/brand.jsx';
 import CategoryPage from './component/admin/pages/category.jsx';
 import UserPage from './component/admin/pages/user.jsx';
 import ColorPage from "./component/admin/pages/color.jsx";
-import StoragePage from "./component/admin/pages/storage.jsx";
-import TargetPage from "./component/admin/pages/target.jsx";
 import LoginPage from './component/admin/pages/login.jsx';
 import { AuthWrapper } from './component/context/auth.context.jsx';
 import NotifyProvider from "./component/context/notify.provider.jsx";
@@ -31,11 +29,9 @@ const router = createBrowserRouter([
       { path: "product-groups", element: <ProductGroupPage /> },
       { path: "products", element: <ProductPage /> },
       { path: "products/colors", element: <ColorPage /> },
-      { path: "products/storages", element: <StoragePage /> },
       { path: "brands", element: <BrandPage /> },
       { path: "categories", element: <CategoryPage /> },
       { path: "users", element: <UserPage /> },
-      { path: "targets", element: <TargetPage /> },
     ]
   },
   {
