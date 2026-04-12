@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
-import Header from "./component/client/Layout/Header.jsx";
-import { useContext } from "react";
-import Footer from "./component/client/Layout/footer.jsx";
+import Header from "./layouts/client/Header.jsx";
+import Footer from "./layouts/client/footer.jsx";
 
 const AppUser = () => {
     return (

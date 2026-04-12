@@ -1,14 +1,14 @@
 import { useContext, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import Header from './component/admin/layout/Header.jsx';
-import Sidebar from './component/admin/layout/Sidebar.jsx';
-import { AuthContext } from './component/context/auth.context.jsx';
+import Header from './layouts/admin/Header.jsx';
+import Sidebar from './layouts/admin/Sidebar.jsx';
+import { AuthContext } from './contexts/auth.context.jsx';
 
 export default function App() {
   const { user } = useContext(AuthContext);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  if (!user || user.role?.name !== "Admin") {
+  if (!user || user.role?.name !== "ADMIN") {
     return <Navigate to="/" replace />;
   }
 
