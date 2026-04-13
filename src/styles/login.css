@@ -46,6 +46,7 @@
     border: 1px solid rgba(255, 255, 255, 0.8);
     position: relative;
     z-index: 1;
+     margin: 0 auto; 
 }
 
 .login-title {

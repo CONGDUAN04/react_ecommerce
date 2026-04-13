@@ -1,112 +1,123 @@
-import { Divider, Button, Form, Input } from "antd";
+import { Divider, Button, Form, Input, Row, Col } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { getAccountAPI, loginUserAPI } from "../../services/api.auth.js";
-import { useContext, useState } from "react";
-import { AuthContext } from "../../contexts/auth.context.jsx";
+import { useContext } from "react";
 import { NotifyContext } from "../../contexts/notify.context.jsx";
+import { useAuth } from "../../hooks/useAuth.js";
+import { useLoading } from "../../hooks/useLoading.js";
 import "../../styles/login.css";
+import { handleApiError, handleApiSuccess } from "../../utils/apiHandler.js";
 
 const LoginPage = () => {
-    const [form] = Form.useForm();
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
-    const { setUser } = useContext(AuthContext);
-    const { api, contextHolder } = useContext(NotifyContext);
+  const [form] = Form.useForm();
+  const navigate = useNavigate();
 
-    const onFinish = async (values) => {
-        setLoading(true);
-        try {
-            const res = await loginUserAPI(values.email, values.password);
-            const token = res?.data?.access_token;
+  const { setUser, callAuth } = useAuth();
+  const { api } = useContext(NotifyContext);
+  const { loading } = useLoading();
 
-            if (!token) throw new Error("No access token returned");
+  const onFinish = async (values) => {
+    if (loading) return;
 
-            localStorage.setItem("access_token", token);
+    try {
+      const res = await callAuth(
+        () => loginUserAPI(values.email, values.password),
+        { showLoading: false },
+      );
 
-            const userRes = await getAccountAPI();
-            const user = userRes?.data?.user || null;
+      const token = res?.data?.access_token;
+      if (!token) throw new Error("Token không hợp lệ");
 
-            setUser(user);
-            localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("access_token", token);
 
-            api.success({
-                message: "Đăng nhập thành công",
-                description: res?.message || "Chào mừng bạn trở lại!",
-                duration: 1.5,
-            });
+      const userRes = await callAuth(() => getAccountAPI(), {
+        showLoading: false,
+      });
 
-            setTimeout(() => {
-                if (user?.role?.name === "ADMIN") navigate("/admin");
-                else navigate("/");
-            }, 800);
+      const user = userRes?.data;
+      if (!user) throw new Error("Không lấy được user");
 
-        } catch (error) {
-            if (error.response?.data?.errors && error.response.data.errors.length > 0) {
-                const formErrors = error.response.data.errors.map(err => ({
-                    name: err.field.replace('body.', ''),
-                    errors: [err.message],
-                }));
-                form.setFields(formErrors);
-            } else {
-                const errorMessage = error.response?.data?.message ||
-                    error.message ||
-                    "Đã có lỗi xảy ra";
-                api.error({
-                    message: "Thất Bại",
-                    description: errorMessage,
-                    duration: 3,
-                });
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
+      setUser(user);
+      localStorage.setItem("user", JSON.stringify(user));
 
-    return (
-        <>
-            <div className="login-container">
-                <div className="login-box">
-                    <h2 className="login-title">Đăng nhập</h2>
-                    <p className="login-subtitle">Chào mừng bạn trở lại 👋</p>
-                    <Form form={form} layout="vertical" onFinish={onFinish}>
-                        <Form.Item
-                            label="Email"
-                            name="email"
-                            rules={[
-                                { required: true, message: "Email không được để trống!" },
-                                { type: "email", message: "Email không đúng định dạng!" },
-                            ]}
-                        >
-                            <Input size="large" placeholder="example@gmail.com" />
-                        </Form.Item>
-                        <Form.Item
-                            label="Mật khẩu"
-                            name="password"
-                            rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
-                        >
-                            <Input.Password
-                                size="large"
-                                placeholder="Nhập mật khẩu"
-                                onKeyDown={(e) => e.key === "Enter" && form.submit()}
-                            />
-                        </Form.Item>
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            className="login-btn"
-                            loading={loading}
-                        >
-                            Đăng nhập
-                        </Button>
-                    </Form>
-                    <Divider />
-                    <div className="login-footer">
-                        Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
-                    </div>
-                </div>
+      handleApiSuccess(api, "Đăng nhập thành công!");
+
+      setTimeout(() => {
+        navigate(user?.role?.name === "ADMIN" ? "/admin" : "/");
+      }, 500);
+    } catch (err) {
+      handleApiError(api, err, form);
+    }
+  };
+
+  return (
+    <div className="login-container">
+      <Row
+        justify="center"
+        align="middle"
+        style={{ minHeight: "100vh", width: "100%" }}
+      >
+        <Col
+          xs={24}
+          sm={20}
+          md={14}
+          lg={10}
+          xl={8}
+          style={{ display: "flex", justifyContent: "center" }}
+        >
+          <div className="login-box">
+            <h2 className="login-title">Đăng nhập</h2>
+            <p className="login-subtitle">Chào mừng bạn trở lại 👋</p>
+
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={onFinish}
+              disabled={loading}
+            >
+              <Form.Item
+                label="Email"
+                name="email"
+                rules={[
+                  { required: true, message: "Email không được để trống!" },
+                  { type: "email", message: "Email không đúng định dạng!" },
+                ]}
+              >
+                <Input size="large" placeholder="example@gmail.com" autoFocus />
+              </Form.Item>
+
+              <Form.Item
+                label="Mật khẩu"
+                name="password"
+                rules={[
+                  { required: true, message: "Mật khẩu không được để trống!" },
+                  { min: 6, message: "Mật khẩu tối thiểu 6 ký tự!" },
+                ]}
+              >
+                <Input.Password size="large" placeholder="Nhập mật khẩu" />
+              </Form.Item>
+
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                className="login-btn"
+                block
+              >
+                Đăng nhập
+              </Button>
+            </Form>
+
+            <Divider />
+
+            <div className="login-footer">
+              Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
             </div>
-        </>
-    );
+          </div>
+        </Col>
+      </Row>
+    </div>
+  );
 };
 
 export default LoginPage;

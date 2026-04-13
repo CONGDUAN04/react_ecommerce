@@ -14,7 +14,9 @@ export const AuthWrapper = ({ children }) => {
 
     useEffect(() => {
         const u = localStorage.getItem("user");
-        if (u) setUser(JSON.parse(u));
+        if (u && u !== "null") {
+    setUser(JSON.parse(u));
+}
         setIsAppLoading(false);
     }, []);
 

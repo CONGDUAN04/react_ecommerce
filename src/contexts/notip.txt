@@ -1,0 +1,52 @@
+import { notification } from "antd";
+import { NotifyContext } from "./notify.context.jsx";
+
+const NotifyProvider = ({ children }) => {
+    const [api, contextHolder] = notification.useNotification();
+
+    const notify = {
+        success: (message, description) => {
+            api.success({
+                message: message || "Thành công",
+                description,
+                placement: "topRight",
+                duration: 2,
+            });
+        },
+
+        error: (message, description) => {
+            api.error({
+                message: message || "Thất bại",
+                description,
+                placement: "topRight",
+                duration: 3,
+            });
+        },
+
+        warning: (message, description) => {
+            api.warning({
+                message,
+                description,
+                placement: "topRight",
+                duration: 3,
+            });
+        },
+
+        info: (message, description) => {
+            api.info({
+                message,
+                description,
+                placement: "topRight",
+                duration: 2,
+            });
+        },
+    };
+
+    return (
+        <NotifyContext.Provider value={notify}>
+            {contextHolder}
+            {children}
+        </NotifyContext.Provider>
+    );
+};
+export default NotifyProvider;
