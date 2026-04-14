@@ -50,37 +50,14 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: "#3b82f6",
-          borderRadius: 12,
-          fontSize: 14,
-        },
-        components: {
-          Button: {
-            controlHeight: 48,
-            borderRadius: 12,
-          },
-          Input: {
-            controlHeight: 44,
-            borderRadius: 12,
-          },
-          Card: {
-            borderRadius: 20,
-          },
-        },
-      }}
-    >
-      <AuthWrapper>
-        <LoadingProvider>
-          <NotifyProvider>
-            <GlobalSpin>
-              <RouterProvider router={router} />
-            </GlobalSpin>
-          </NotifyProvider>
-        </LoadingProvider>
-      </AuthWrapper>
-    </ConfigProvider>
+    <NotifyProvider>
+      <LoadingProvider>
+        <AuthWrapper>
+          <GlobalSpin>
+            <RouterProvider router={router} />
+          </GlobalSpin>
+        </AuthWrapper>
+      </LoadingProvider>
+    </NotifyProvider>
   </React.StrictMode>,
 );

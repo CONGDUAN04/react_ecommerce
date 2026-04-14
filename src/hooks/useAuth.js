@@ -3,7 +3,7 @@
 import { useContext } from "react";
 import { NotifyContext } from "../contexts/notify.context";
 import { AuthContext } from "../contexts/auth.context";
-import { handleApiError, handleApiSuccess } from "../utils/apiHandler";
+import { handleApiSuccess } from "../utils/apiHandler";
 import { useApi } from "./useApi";
 
 export const useAuth = () => {
