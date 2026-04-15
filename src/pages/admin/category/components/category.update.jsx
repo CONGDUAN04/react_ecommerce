@@ -1,5 +1,6 @@
-import { Form, Input, Modal } from "antd";
+import { Form, Input } from "antd";
 import { useEffect, useState } from "react";
+import BaseModal from "../../../../components/common/BaseModal.jsx";
 import { useCategory } from "../hooks/useCategory.js";
 
 export default function UpdateCategoryForm({
@@ -10,7 +11,6 @@ export default function UpdateCategoryForm({
   loadCategory,
 }) {
   const [form] = Form.useForm();
-  const [file, setFile] = useState(null);
 
   const { update } = useCategory();
 
@@ -29,7 +29,6 @@ export default function UpdateCategoryForm({
       dataUpdate.id,
       {
         ...values,
-        image: file,
       },
       form,
     );
@@ -42,21 +41,18 @@ export default function UpdateCategoryForm({
 
   const resetAndClose = () => {
     form.resetFields();
-    setFile(null);
     setDataUpdate(null);
     setOpenUpdate(false);
   };
 
   return (
-    <Modal
-      title={<div style={{ textAlign: "center" }}>Cập nhật danh mục</div>}
+    <BaseModal
       open={openUpdate}
       onOk={() => form.submit()}
       onCancel={resetAndClose}
+      title="Cập nhật danh mục"
       okText="Cập nhật"
       cancelText="Huỷ"
-      centered
-      maskClosable={false}
       width={600}
     >
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
@@ -72,6 +68,6 @@ export default function UpdateCategoryForm({
           <Input />
         </Form.Item>
       </Form>
-    </Modal>
+    </BaseModal>
   );
 }

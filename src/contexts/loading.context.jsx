@@ -1,5 +1,4 @@
-// src/contexts/loading.context.jsx
-import { createContext, useState, useCallback } from "react";
+import { createContext, useState, useCallback, useMemo } from "react";
 
 export const LoadingContext = createContext({
   loading: false,
@@ -20,10 +19,17 @@ const LoadingProvider = ({ children }) => {
 
   const loading = count > 0;
 
+  const value = useMemo(
+    () => ({
+      loading,
+      startLoading,
+      stopLoading,
+    }),
+    [loading, startLoading, stopLoading],
+  );
+
   return (
-    <LoadingContext.Provider value={{ loading, startLoading, stopLoading }}>
-      {children}
-    </LoadingContext.Provider>
+    <LoadingContext.Provider value={value}>{children}</LoadingContext.Provider>
   );
 };
 

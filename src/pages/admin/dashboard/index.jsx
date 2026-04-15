@@ -4,7 +4,6 @@ import { fetchAllDashboardAPI } from "../../../services/api.dashboard.js";
 import { message } from "antd";
 import Dashboard from "./dashboard.jsx";
 import { useApi } from "../../../hooks/useApi";
-import AdminLayout from "../../../layouts/admin/AdminLayout.jsx";
 
 const DashboardPage = () => {
   const [dataDashboard, setDataDashboard] = useState([]);
@@ -19,11 +18,7 @@ const DashboardPage = () => {
     loadDashboard();
   }, []);
 
-  return (
-    <AdminLayout>
-      <Dashboard dataDashboard={dataDashboard} />
-    </AdminLayout>
-  );
+  return <Dashboard dataDashboard={dataDashboard} />;
 };
 
 export default DashboardPage;

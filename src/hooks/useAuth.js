@@ -1,6 +1,5 @@
 /* eslint-disable no-useless-catch */
-// src/hooks/useAuth.js
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { NotifyContext } from "../contexts/notify.context";
 import { AuthContext } from "../contexts/auth.context";
 import { handleApiSuccess } from "../utils/apiHandler";
@@ -8,13 +7,12 @@ import { useApi } from "./useApi";
 
 export const useAuth = () => {
   const { api } = useContext(NotifyContext);
-  console.log("API AUTH:", api);
   const auth = useContext(AuthContext);
   const { callApi } = useApi();
 
-  const callAuth = async (fn, { successMessage, form } = {}) => {
+  const callAuth = async (fn, { successMessage } = {}) => {
     try {
-      const res = await callApi(fn); // 🔥 auto loading
+      const res = await callApi(fn);
 
       if (successMessage) {
         handleApiSuccess(api, successMessage);
@@ -26,8 +24,11 @@ export const useAuth = () => {
     }
   };
 
-  return {
-    ...auth,
-    callAuth,
-  };
+  return useMemo(
+    () => ({
+      ...auth,
+      callAuth,
+    }),
+    [auth, callAuth],
+  );
 };

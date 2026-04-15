@@ -1,27 +1,24 @@
-// src/component/admin/pages/category.jsx
 import { useEffect, useState } from "react";
 import { CategoryTable } from "./components/category.table.jsx";
 import CreateCategoryForm from "./components/category.create.jsx";
 import { useCategory } from "./hooks/useCategory.js";
+import { usePagination } from "../../../hooks/usePagination";
 
 const CategoryPage = () => {
   const [dataCategories, setDataCategories] = useState([]);
-  const [current, setCurrent] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
-
+  const { current, pageSize, updatePagination } = usePagination();
   const { getAll } = useCategory();
-
   const loadCategory = async () => {
     const res = await getAll(current, pageSize);
-
     if (res?.data) {
       setDataCategories(res.data);
-      setTotal(res.pagination?.total || 0);
+      setTotal(res.meta.total);
     }
   };
 
   useEffect(() => {
+    if (!current || !pageSize) return;
     loadCategory();
   }, [current, pageSize]);
 
@@ -34,8 +31,7 @@ const CategoryPage = () => {
         current={current}
         pageSize={pageSize}
         total={total}
-        setCurrent={setCurrent}
-        setPageSize={setPageSize}
+        updatePagination={updatePagination}
       />
     </>
   );

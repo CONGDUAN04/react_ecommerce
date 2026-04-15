@@ -6,14 +6,12 @@ import { useCategory } from "../hooks/useCategory.js";
 
 export default function CreateCategoryForm({ loadCategory }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [image, setImage] = useState(null);
   const [form] = Form.useForm();
 
   const { create } = useCategory();
 
   const resetAndCloseModal = () => {
     form.resetFields();
-    setImage(null);
     setIsModalOpen(false);
   };
 
@@ -21,8 +19,6 @@ export default function CreateCategoryForm({ loadCategory }) {
     const res = await create(
       {
         name: values.name,
-        description: values.description,
-        image,
       },
       form,
     );

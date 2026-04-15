@@ -7,20 +7,23 @@ const BaseTable = ({
   current,
   pageSize,
   total,
-  setCurrent,
-  setPageSize,
+  updatePagination,
   showSizeChanger = true,
-  showTotal,
-  scroll = { x: 1200 },
+  showTotal = (total, range) =>
+    `Hiển thị ${range[0]}-${range[1]} trên tổng ${total} bản ghi`,
 }) => {
+  const onChange = (pagination) => {
+    updatePagination(pagination.current, pagination.pageSize);
+  };
+
   return (
     <div
       style={{
-        margin: 0,
         border: "1px solid #f0f0f0",
-        borderRadius: 16,
+        borderRadius: 12,
         overflow: "hidden",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+        background: "#fff",
       }}
     >
       <Table
@@ -28,17 +31,13 @@ const BaseTable = ({
         dataSource={data}
         rowKey={rowKey}
         pagination={{
-          current,
-          pageSize,
+          current: current || 1, // ✅ FIX
+          pageSize: pageSize || 10, // ✅ FIX
           total,
           showSizeChanger,
           showTotal,
-          onChange: (page, size) => {
-            setCurrent?.(page);
-            setPageSize?.(size);
-          },
         }}
-        scroll={scroll}
+        onChange={onChange}
       />
     </div>
   );

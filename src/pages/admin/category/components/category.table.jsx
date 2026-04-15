@@ -13,8 +13,7 @@ export const CategoryTable = (props) => {
     current,
     pageSize,
     total,
-    setCurrent,
-    setPageSize,
+    updatePagination,
   } = props;
 
   const [openDetail, setOpenDetail] = useState(false);
@@ -29,7 +28,7 @@ export const CategoryTable = (props) => {
     if (res) await loadCategory();
   };
   const columns = [
-    renderIndex(),
+    renderIndex(current, pageSize),
     renderId(),
     {
       title: <div style={{ fontWeight: 600 }}>Tên danh mục</div>,
@@ -55,7 +54,7 @@ export const CategoryTable = (props) => {
           }}
           onDelete={() => handleDelete(record.id)}
           deleteTitle="Xóa danh mục"
-          deleteDescription="Bạn có chắc chắn muốn xóa danh mục này?"
+          deleteDescription="Hành động này không thể hoàn tác!"
         />
       ),
     },
@@ -69,8 +68,7 @@ export const CategoryTable = (props) => {
         current={current}
         pageSize={pageSize}
         total={total}
-        setCurrent={setCurrent}
-        setPageSize={setPageSize}
+        updatePagination={updatePagination}
       />
 
       <CategoryDetail

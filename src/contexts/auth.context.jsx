@@ -1,30 +1,37 @@
-
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useMemo } from "react";
 
 export const AuthContext = createContext({
-    user: null,
-    setUser: () => { },
-    isAppLoading: true,
-    setIsAppLoading: () => { },
+  user: null,
+  setUser: () => {},
+  isAppLoading: true,
+  setIsAppLoading: () => {},
 });
 
 export const AuthWrapper = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [isAppLoading, setIsAppLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [isAppLoading, setIsAppLoading] = useState(true);
 
-    useEffect(() => {
-        const u = localStorage.getItem("user");
-        if (u && u !== "null") {
-    setUser(JSON.parse(u));
-}
-        setIsAppLoading(false);
-    }, []);
+  useEffect(() => {
+    const u = localStorage.getItem("user");
 
-    if (isAppLoading) return <div>Loading...</div>; // Chờ load xong
+    if (u && u !== "null") {
+      setUser(JSON.parse(u));
+    }
 
-    return (
-        <AuthContext.Provider value={{ user, setUser, isAppLoading }}>
-            {children}
-        </AuthContext.Provider>
-    );
+    setIsAppLoading(false);
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      user,
+      setUser,
+      isAppLoading,
+      setIsAppLoading,
+    }),
+    [user, isAppLoading],
+  );
+
+  if (isAppLoading) return <div>Loading...</div>;
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

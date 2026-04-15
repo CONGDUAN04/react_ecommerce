@@ -28,8 +28,8 @@ const CategoryDetail = ({
           <Descriptions column={1} bordered size="small">
             <Descriptions.Item label="ID">{dataDetail.id}</Descriptions.Item>
             <Descriptions.Item label="Tên">{dataDetail.name}</Descriptions.Item>
-            <Descriptions.Item label="Mô tả">
-              {dataDetail.description || "N/A"}
+            <Descriptions.Item label="Slug">
+              {dataDetail.slug || "N/A"}
             </Descriptions.Item>
           </Descriptions>
 
