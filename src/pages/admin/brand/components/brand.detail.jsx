@@ -1,57 +1,34 @@
-import { Modal, Descriptions, Divider, Empty } from "antd";
-import dayjs from "dayjs";
+import { Descriptions, Empty } from "antd";
+import BaseModal from "../../../../components/common/BaseModal.jsx";
+import ImagePreviewItem from "../../../../components/common/ImagePreviewItem.jsx";
 
-const BrandDetail = ({ dataDetail, setDataDetail, openDetail, setOpenDetail }) => {
-    const handleClose = () => {
-        setDataDetail(null);
-        setOpenDetail(false);
-    };
+export default function BrandDetail({ dataDetail, openDetail, setOpenDetail }) {
+  const handleClose = () => {
+    setOpenDetail(false);
+  };
 
-    if (!dataDetail) {
-        return (
-            <Modal title="Chi tiết thương hiệu" open={openDetail} onCancel={handleClose} footer={null} width={600} centered>
-                <Empty />
-            </Modal>
-        );
-    }
+  return (
+    <BaseModal
+      open={openDetail}
+      onCancel={handleClose}
+      title="Chi tiết thương hiệu"
+      footer={null}
+    >
+      {!dataDetail ? (
+        <Empty />
+      ) : (
+        <Descriptions column={1} bordered size="middle">
+          <Descriptions.Item label="ID">{dataDetail.id}</Descriptions.Item>
 
-    return (
-        <Modal
-            title={<div style={{ textAlign: "center", fontWeight: 600 }}>Chi tiết thương hiệu</div>}
-            open={openDetail}
-            onCancel={handleClose}
-            footer={null}
-            width={600}
-            centered
-            maskClosable={false}
-            styles={{ body: { paddingBottom: 56 } }}
-        >
-            <Descriptions column={1} bordered size="small" labelStyle={{ fontWeight: 600, width: 140 }}>
-                <Descriptions.Item label="ID">{dataDetail.id}</Descriptions.Item>
-                <Descriptions.Item label="Tên thương hiệu">{dataDetail.name}</Descriptions.Item>
-            </Descriptions>
+          <Descriptions.Item label="Tên">{dataDetail.name}</Descriptions.Item>
 
-            {dataDetail.image && (
-                <>
-                    <Divider>Hình ảnh</Divider>
-                    <div style={{ display: "flex", justifyContent: "center" }}>
-                        <img
-                            src={`${import.meta.env.VITE_BACKEND_URL}/images/brand/${dataDetail.image}`}
-                            alt={dataDetail.name}
-                            style={{ maxHeight: 180, maxWidth: "100%", objectFit: "contain" }}
-                        />
-                    </div>
-                </>
-            )}
+          <Descriptions.Item label="Slug">{dataDetail.slug}</Descriptions.Item>
 
-            {dataDetail.createdAt && dataDetail.updatedAt && (
-                <div style={{ position: "absolute", right: 24, bottom: 16, fontSize: 14, color: "#999", textAlign: "right" }}>
-                    <div>Tạo: {dayjs(dataDetail.createdAt).format("DD/MM/YYYY HH:mm")}</div>
-                    <div>Cập nhật: {dayjs(dataDetail.updatedAt).format("DD/MM/YYYY HH:mm")}</div>
-                </div>
-            )}
-        </Modal>
-    );
-};
-
-export default BrandDetail;
+          <Descriptions.Item label="Logo">
+            <ImagePreviewItem src={dataDetail.logo} />
+          </Descriptions.Item>
+        </Descriptions>
+      )}
+    </BaseModal>
+  );
+}

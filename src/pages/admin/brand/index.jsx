@@ -1,54 +1,42 @@
-// src/component/admin/pages/brand.jsx
-import { useEffect, useState, useContext } from "react";
-import { BrandTable } from "./components/brand.table.jsx";
-import { fetchAllBrandsAPI } from "../../../services/api.services.js";
-import AdminLayout from "../layout/AdminLayout.jsx";
-import { LoadingContext } from "../../context/loading.context.jsx";
+import { useEffect, useState } from "react";
+import BrandTable from "./components/brand.table.jsx";
 import CreateBrandForm from "./components/brand.create.jsx";
+import { useBrand } from "./hooks/useBrand.js";
+import { usePagination } from "../../../hooks/usePagination";
 
 const BrandPage = () => {
-    const [dataBrand, setDataBrand] = useState([]);
-    const [current, setCurrent] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
-    const [total, setTotal] = useState(0);
-    const { setLoading } = useContext(LoadingContext);
+  const [dataBrands, setDataBrands] = useState([]);
+  const [total, setTotal] = useState(0);
 
-    const loadBrand = async () => {
-        try {
-            setLoading(true);
-            const res = await fetchAllBrandsAPI(current, pageSize);
-            if (res?.data) {
-                setDataBrand(res.data);
-                setTotal(res.pagination?.total || 0);
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
+  const { current, pageSize, updatePagination } = usePagination();
+  const { getAll } = useBrand();
 
-    useEffect(() => {
-        loadBrand();
-    }, [current, pageSize]);
+  const loadBrand = async () => {
+    const res = await getAll(current, pageSize);
+    if (res?.data) {
+      setDataBrands(res.data);
+      setTotal(res.meta.total);
+    }
+  };
 
-    return (
-        <>
-            <CreateBrandForm loadBrand={loadBrand} />
-            <AdminLayout>
-                <BrandTable
-                    dataBrand={dataBrand}
-                    loadBrand={loadBrand}
-                    current={current}
-                    pageSize={pageSize}
-                    total={total}
-                    setCurrent={setCurrent}
-                    setPageSize={setPageSize}
-                />
-            </AdminLayout>
-        </>
-    );
+  useEffect(() => {
+    if (!current || !pageSize) return;
+    loadBrand();
+  }, [current, pageSize]);
+
+  return (
+    <>
+      <CreateBrandForm loadBrand={loadBrand} />
+      <BrandTable
+        dataBrands={dataBrands}
+        loadBrand={loadBrand}
+        current={current}
+        pageSize={pageSize}
+        total={total}
+        updatePagination={updatePagination}
+      />
+    </>
+  );
 };
-
 
 export default BrandPage;

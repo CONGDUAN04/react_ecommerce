@@ -1,7 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { ConfigProvider } from "antd";
 import "antd/dist/reset.css";
 import "../src/index.css";
 import "nprogress/nprogress.css";
@@ -11,6 +10,7 @@ import AppClient from "./AppClient.jsx";
 import HomePage from "./pages/admin/dashboard/index.jsx";
 import AdminRoute from "./routes/AdminRoute.jsx";
 import CategoryPage from "./pages/admin/category/index.jsx";
+import BrandPage from "./pages/admin/brand/index.jsx";
 import LoginPage from "./pages/auth/login.jsx";
 import RegisterPage from "./pages/auth/register.jsx";
 import HomePageUser from "./pages/client/homepage.jsx";
@@ -31,6 +31,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: "categories", element: <CategoryPage /> },
+      { path: "brands", element: <BrandPage /> },
     ],
   },
   {

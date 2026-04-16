@@ -4,7 +4,10 @@ import BaseActionButtons from "../../../../components/common/BaseActionButtons.j
 import UpdateCategoryForm from "./category.update";
 import CategoryDetail from "./category.detail";
 import { useCategory } from "../hooks/useCategory.js";
-import { renderIndex, renderId } from "../../../../utils/tableColumns.jsx";
+import {
+  renderIndex,
+  renderId,
+} from "../../../../components/common/tableColumns.jsx";
 
 export const CategoryTable = (props) => {
   const {

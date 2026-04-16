@@ -8,8 +8,10 @@ export const handleApiSuccess = (api, message) => {
 
 export const handleApiError = (api, err, form) => {
   const error = err?.error || err;
-  console.log("DEBUG ERROR:", error);
-  if (error?.code === "VALIDATION_ERROR") {
+  if (
+    (error?.code === "VALIDATION_ERROR" || error?.ErrorCode === 1) &&
+    error?.errors
+  ) {
     const fieldMapping = {
       username: "email",
       password: "password",
@@ -26,7 +28,7 @@ export const handleApiError = (api, err, form) => {
     }
   }
 
-  if (error?.code === "CONFLICT") {
+  if (error?.code === "CONFLICT" || error?.ErrorCode === 2) {
     api.warning({
       message: "Thông báo",
       description: error.message,

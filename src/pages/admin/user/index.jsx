@@ -8,30 +8,29 @@ import { LoadingContext } from "../../context/loading.context.jsx";
 import CreateUserForm from "../../../component/admin/user/user.create.jsx";
 
 const UserPage = () => {
-    const [dataUser, setDataUser] = useState([]);
-    const { setLoading } = useContext(LoadingContext);
+  const [dataUser, setDataUser] = useState([]);
+  const { setLoading } = useContext(LoadingContext);
 
-    const loadUser = async () => {
-        setLoading(true);
-        const res = await fetchAllUserAPI();
-        if (res?.data) setDataUser(res.data);
-        else message.error("Không tải được danh sách người dùng!");
-        setLoading(false);
-    };
+  const loadUser = async () => {
+    setLoading(true);
+    const res = await fetchAllUserAPI();
+    if (res?.data) setDataUser(res.data);
+    else message.error("Không tải được danh sách người dùng!");
+    setLoading(false);
+  };
 
-    useEffect(() => {
-        loadUser();
-    }, []);
+  useEffect(() => {
+    loadUser();
+  }, []);
 
-    return (
-        <>
-            <CreateUserForm loadUsers={loadUser} />
-            <AdminLayout>
-                <UserTable dataUser={dataUser} loadUser={loadUser} />
-            </AdminLayout>
-        </>
-
-    );
+  return (
+    <>
+      <CreateUserForm loadUsers={loadUser} />
+      <AdminLayout>
+        <UserTable dataUser={dataUser} loadUser={loadUser} />
+      </AdminLayout>
+    </>
+  );
 };
 
 export default UserPage;
