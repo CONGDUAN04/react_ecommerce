@@ -1,4 +1,4 @@
-export const uploadCloudinary = async (file) => {
+export const uploadCloudinary = async (file, folder = "default") => {
   const formData = new FormData();
 
   formData.append("file", file);
@@ -6,6 +6,11 @@ export const uploadCloudinary = async (file) => {
     "upload_preset",
     import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
   );
+
+  formData.append("folder", folder);
+
+  // ✅ FIX: mỗi ảnh 1 public_id riêng → tránh cache
+  formData.append("public_id", `${folder}_${Date.now()}`);
 
   const res = await fetch(
     `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`,
@@ -17,5 +22,9 @@ export const uploadCloudinary = async (file) => {
 
   const data = await res.json();
 
-  return data.secure_url;
+  if (!res.ok) {
+    throw new Error(data?.error?.message || "Upload failed");
+  }
+
+  return data.secure_url; // ✅ luôn là URL sạch
 };

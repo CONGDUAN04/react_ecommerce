@@ -1,11 +1,19 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { uploadCloudinary } from "../utils/uploadCloudinary";
 import { message } from "antd";
 
-export const useImageUpload = (form) => {
+export const useImageUpload = (
+  form,
+  fieldName = "image",
+  folder = "default",
+) => {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [uploadedUrl, setUploadedUrl] = useState(null);
+
+  // ✅ Giữ form ref luôn fresh
+  const formRef = useRef(form);
+  formRef.current = form;
 
   const handleChangeFile = async (e) => {
     const file = e.target.files?.[0];
@@ -15,14 +23,19 @@ export const useImageUpload = (form) => {
       message.error("Chỉ được upload file ảnh!");
       return;
     }
+
     setPreview(URL.createObjectURL(file));
     setLoading(true);
 
     try {
-      const url = await uploadCloudinary(file);
+      const url = await uploadCloudinary(file, folder);
 
       setUploadedUrl(url);
-      form?.setFieldsValue({ logo: url });
+
+      // ✅ Dùng formRef thay vì form trực tiếp
+      formRef.current?.setFieldsValue({
+        [fieldName]: url,
+      });
 
       setPreview(url);
     } catch (err) {
@@ -32,9 +45,13 @@ export const useImageUpload = (form) => {
     }
   };
 
+  // ✅ Reset sạch hoàn toàn
   const resetImage = () => {
     setPreview(null);
     setUploadedUrl(null);
+    formRef.current?.setFieldsValue({
+      [fieldName]: null,
+    });
   };
 
   const setPreviewFromUrl = (url) => {

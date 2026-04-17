@@ -1,10 +1,21 @@
 import { UploadOutlined } from "@ant-design/icons";
+import { useRef } from "react";
 
 export default function UploadImage({
   preview,
   onChange,
   label = "Upload ảnh",
 }) {
+  const inputRef = useRef(null);
+
+  const handleChange = (e) => {
+    onChange(e);
+    // ✅ Reset input sau khi chọn để có thể chọn lại
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+  };
+
   return (
     <>
       <div style={{ textAlign: "center", marginBottom: 12 }}>
@@ -19,7 +30,13 @@ export default function UploadImage({
           }}
         >
           <UploadOutlined /> {label}
-          <input type="file" hidden accept="image/*" onChange={onChange} />
+          <input
+            ref={inputRef}
+            type="file"
+            hidden
+            accept="image/*"
+            onChange={handleChange}
+          />
         </label>
       </div>
 
