@@ -1,36 +1,37 @@
-// src/component/admin/pages/user.jsx
-import { useEffect, useState, useContext } from "react";
-import { fetchAllUserAPI } from "../../../services/api.services.js";
-import { UserTable } from "../../../component/admin/user/user.table.jsx";
-import AdminLayout from "../layout/AdminLayout.jsx";
-import { message } from "antd";
-import { LoadingContext } from "../../context/loading.context.jsx";
-import CreateUserForm from "../../../component/admin/user/user.create.jsx";
-
+import { useEffect, useState } from "react";
+import { usePagination } from "../../../hooks/usePagination";
+import { useUser } from "./hooks/useUser";
+import UserTable from "./components/user.table";
+import CreateUserForm from "./components/user.create";
 const UserPage = () => {
-  const [dataUser, setDataUser] = useState([]);
-  const { setLoading } = useContext(LoadingContext);
+  const [dataUsers, setDataUsers] = useState([]);
+  const [total, setTotal] = useState(0);
+  const { current, pageSize, updatePagination } = usePagination();
+  const { getAll } = useUser();
 
   const loadUser = async () => {
-    setLoading(true);
-    const res = await fetchAllUserAPI();
-    if (res?.data) setDataUser(res.data);
-    else message.error("Không tải được danh sách người dùng!");
-    setLoading(false);
+    const res = await getAll(current, pageSize);
+    if (res?.data) {
+      setDataUsers(res.data);
+      setTotal(res.meta.total);
+    }
   };
-
   useEffect(() => {
+    if (!current || !pageSize) return;
     loadUser();
-  }, []);
-
+  }, [current, pageSize]);
   return (
     <>
-      <CreateUserForm loadUsers={loadUser} />
-      <AdminLayout>
-        <UserTable dataUser={dataUser} loadUser={loadUser} />
-      </AdminLayout>
+      <CreateUserForm loadUser={loadUser} />
+      <UserTable
+        dataUsers={dataUsers}
+        loadUser={loadUser}
+        current={current}
+        pageSize={pageSize}
+        total={total}
+        updatePagination={updatePagination}
+      />
     </>
   );
 };
-
 export default UserPage;

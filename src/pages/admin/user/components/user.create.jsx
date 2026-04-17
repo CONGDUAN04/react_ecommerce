@@ -1,211 +1,122 @@
-import {
-    Button,
-    Form,
-    Input,
-    Modal,
-    Select,
-} from "antd";
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
-import { useContext, useEffect, useState } from "react";
-import { createUserAPI, fetchAllRolesAPI } from "../../../../services/api.services";
-import { LoadingContext } from "../../context/loading.context";
-import { NotifyContext } from "../../context/notify.context";
+import { useState } from "react";
+import { Form, Input, Select } from "antd";
+import BaseModal from "../../../../components/common/BaseModal.jsx";
+import BaseCreateButton from "../../../../components/common/BaseCreateButton.jsx";
+import { useUser } from "../hooks/useUser.js";
+import { useRole } from "../../role/hooks/useRole.js";
+import { useImageUpload } from "../../../../hooks/useImageUpload.js";
+import UploadImage from "../../../../components/common/ImageUpload.jsx";
+import { useEffect } from "react";
 
-export default function CreateUserForm({ loadUsers }) {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [form] = Form.useForm();
-    const [roles, setRoles] = useState([]);
-    const [avatar, setAvatar] = useState(null);
-    const [preview, setPreview] = useState(null);
+export default function CreateUserForm({ loadUser }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [form] = Form.useForm();
+  const [roles, setRoles] = useState([]);
 
-    const { api, contextHolder } = useContext(NotifyContext);
-    const { loading, setLoading } = useContext(LoadingContext);
+  const { create } = useUser();
+  const { getAll: getAllRoles } = useRole();
+  const { preview, handleChangeFile, resetImage } = useImageUpload(
+    form,
+    "avatar",
+    "avatars",
+  );
 
-    useEffect(() => {
-        loadRoles();
-    }, []);
-
+  useEffect(() => {
+    if (!isOpen) return;
     const loadRoles = async () => {
-        try {
-            const res = await fetchAllRolesAPI();
-            setRoles(res.data || []);
-        } catch {
-            api.error({
-                message: "Lỗi",
-                description: "Không thể tải role",
-            });
-        }
+      const res = await getAllRoles();
+      setRoles(res?.data || []);
+    };
+    loadRoles();
+  }, [isOpen]);
+
+  const reset = () => {
+    form.resetFields();
+    resetImage();
+    setIsOpen(false);
+    setRoles([]);
+  };
+
+  const handleSubmit = async (values) => {
+    const payload = {
+      username: values.username,
+      fullName: values.fullName,
+      phone: values.phone,
+      roleId: values.roleId,
+      avatar: values.avatar,
     };
 
-    const handleOnchangeFile = (e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
+    const res = await create(payload, form);
 
-        setAvatar(file);
-        setPreview(URL.createObjectURL(file));
-    };
+    if (res) {
+      reset();
+      await loadUser();
+    }
+  };
 
-    const handleSubmitBtn = async (values) => {
-        setLoading(true);
-        try {
-            const res = await createUserAPI({
-                username: values.username,
-                fullName: values.fullName,
-                phone: values.phone,
-                roleId: values.roleId,
-                avatar,
-            });
+  return (
+    <>
+      <BaseCreateButton onClick={() => setIsOpen(true)} text="Tạo người dùng" />
 
-            api.success({
-                message: "Thành công",
-                description: res.message,
-            });
+      <BaseModal
+        open={isOpen}
+        onOk={() => form.submit()}
+        onCancel={reset}
+        title="Tạo người dùng"
+        okText="Tạo mới"
+      >
+        <Form form={form} layout="vertical" onFinish={handleSubmit}>
+          <Form.Item
+            label="Email"
+            name="username"
+            rules={[{ required: true, message: "Vui lòng nhập email" }]}
+          >
+            <Input />
+          </Form.Item>
 
-            resetAndCloseModal();
-            await loadUsers();
-        } catch (error) {
-            if (error.errors?.length > 0) {
-                const formErrors = error.errors.map(err => ({
-                    name: err.field.replace("body.", ""),
-                    errors: [err.message],
-                }));
+          <Form.Item
+            label="Họ tên"
+            name="fullName"
+            rules={[{ required: true, message: "Không được để trống" }]}
+          >
+            <Input />
+          </Form.Item>
 
-                console.log("Setting form errors:", formErrors);
-                form.setFields(formErrors);
-            } else {
-                api.error({
-                    message: "Thất bại",
-                    description: error.message || "Đã có lỗi xảy ra",
-                });
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
+          <Form.Item
+            label="Số điện thoại"
+            name="phone"
+            rules={[{ required: true, message: "Không được để trống" }]}
+          >
+            <Input />
+          </Form.Item>
 
-    const resetAndCloseModal = () => {
-        form.resetFields();
-        setAvatar(null);
-        setPreview(null);
-        setIsModalOpen(false);
-    };
+          <Form.Item
+            label="Phân quyền"
+            name="roleId"
+            rules={[{ required: true, message: "Vui lòng chọn role" }]}
+          >
+            <Select
+              options={roles.map((r) => ({
+                label: r.name,
+                value: r.id,
+              }))}
+            />
+          </Form.Item>
 
-    return (
-        <>
-            {contextHolder}
-
-            <div style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                marginTop: 20,
-                paddingRight: 24
-            }}>
-                <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={() => setIsModalOpen(true)}
-                    size="large"
-                    style={{
-                        height: 42,
-                        padding: '0 24px',
-                        borderRadius: 8,
-                        fontSize: 15,
-                        fontWeight: 500,
-                        boxShadow: '0 2px 4px rgba(24, 144, 255, 0.2)'
-                    }}
-                >
-                    Tạo dung lượng mới
-                </Button>
-            </div>
-            <Modal
-                title={<div style={{ textAlign: "center" }}>Tạo người dùng mới</div>}
-                open={isModalOpen}
-                confirmLoading={loading}
-                onOk={() => form.submit()}
-                onCancel={resetAndCloseModal}
-                okText="Tạo mới"
-                cancelText="Hủy"
-                centered
-                maskClosable={false}
-            >
-                <Form form={form} layout="vertical" onFinish={handleSubmitBtn}>
-                    <Form.Item
-                        label="Email (Username)"
-                        name="username"
-                        rules={[{ required: true, message: "Vui lòng nhập email" }]}
-                    >
-                        <Input placeholder="example@gmail.com" />
-                    </Form.Item>
-
-                    <Form.Item
-                        label="Họ tên"
-                        name="fullName"
-                        rules={[{ required: true, message: "Vui lòng nhập họ tên" }]}
-                    >
-                        <Input />
-                    </Form.Item>
-
-                    <Form.Item label="Số điện thoại" name="phone" rules={[{ required: true, message: "Số điện thoại không được bỏ trống" }]}>
-                        <Input />
-                    </Form.Item>
-
-                    <Form.Item
-                        label="Phân quyền"
-                        name="roleId"
-                        rules={[{ required: true, message: "Vui lòng chọn role" }]}
-                    >
-                        <Select
-                            placeholder="Chọn role"
-                            options={roles.map(r => ({
-                                label: r.name,
-                                value: r.id,
-                            }))}
-                        />
-                    </Form.Item>
-
-                    <Form.Item label="Avatar" name="avatar" rules={[{ required: true, message: "Vui lòng chọn ảnh đại diện" }]}>
-                        <div style={{ textAlign: "center", marginBottom: 12 }}>
-                            <label
-                                htmlFor="upload-avatar"
-                                style={{
-                                    padding: "8px 16px",
-                                    background: "#1677ff",
-                                    color: "#fff",
-                                    borderRadius: 6,
-                                    cursor: "pointer",
-                                }}
-                            >
-                                <UploadOutlined /> Upload avatar
-                            </label>
-                            <input
-                                id="upload-avatar"
-                                type="file"
-                                hidden
-                                accept="image/*"
-                                onChange={handleOnchangeFile}
-                            />
-                        </div>
-
-                        {preview && (
-                            <div
-                                style={{
-                                    height: 180,
-                                    border: "1px dashed #ccc",
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                }}
-                            >
-                                <img
-                                    src={preview}
-                                    alt="preview"
-                                    style={{ maxHeight: "100%" }}
-                                />
-                            </div>
-                        )}
-                    </Form.Item>
-                </Form>
-            </Modal>
-        </>
-    );
+          {/* ✅ giống Brand */}
+          <Form.Item
+            label="Avatar"
+            name="avatar"
+            rules={[{ required: true, message: "Vui lòng chọn avatar" }]}
+          >
+            <UploadImage
+              preview={preview}
+              onChange={handleChangeFile}
+              label="Upload avatar"
+            />
+          </Form.Item>
+        </Form>
+      </BaseModal>
+    </>
+  );
 }

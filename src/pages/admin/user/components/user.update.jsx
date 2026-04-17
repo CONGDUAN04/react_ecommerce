@@ -1,184 +1,133 @@
-import {
-    Form,
-    Input,
-    Modal,
-    Select,
-} from "antd";
-import { UploadOutlined } from "@ant-design/icons";
-import { useContext, useEffect, useState } from "react";
-import { updateUserAPI, fetchAllRolesAPI } from "../../../../services/api.services.js";
-import { LoadingContext } from "../../context/loading.context.jsx";
-import { NotifyContext } from "../../context/notify.context.jsx";
+import { useEffect, useState } from "react";
+import { Form, Input, Select } from "antd";
+import BaseModal from "../../../../components/common/BaseModal.jsx";
+import { useUser } from "../hooks/useUser.js";
+import { useRole } from "../../role/hooks/useRole.js";
+import { useImageUpload } from "../../../../hooks/useImageUpload.js";
+import UploadImage from "../../../../components/common/ImageUpload.jsx";
 
 export default function UpdateUserForm({
-    openUpdate,
-    setOpenUpdate,
-    dataUpdate,
-    setDataUpdate,
-    loadUser,
+  openUpdate,
+  setOpenUpdate,
+  dataUpdate,
+  setDataUpdate,
+  loadUser,
 }) {
-    const [form] = Form.useForm();
-    const [roles, setRoles] = useState([]);
-    const [preview, setPreview] = useState(null);
-    const [file, setFile] = useState(null);
-    const { api, contextHolder } = useContext(NotifyContext);
-    const { loading, setLoading } = useContext(LoadingContext);
+  const [form] = Form.useForm();
+  const [roles, setRoles] = useState([]);
 
-    useEffect(() => {
-        const loadRoles = async () => {
-            try {
-                const res = await fetchAllRolesAPI();
-                setRoles(res?.data || []);
-            } catch (error) {
-                api.error({
-                    message: "Không thể tải roles",
-                    description: error.message,
-                });
-            }
-        };
-        loadRoles();
-    }, []);
+  const { update } = useUser();
+  const { getAll: getAllRoles } = useRole();
 
-    // Set data khi mở modal update
-    useEffect(() => {
-        if (!dataUpdate) return;
-        form.setFieldsValue({
-            username: dataUpdate.username,
-            fullName: dataUpdate.fullName,
-            phone: dataUpdate.phone,
-            roleId: dataUpdate.role?.id,
-        });
-        if (dataUpdate.avatar) {
-            setPreview(`${import.meta.env.VITE_BACKEND_URL}/images/avatar/${dataUpdate.avatar}`);
-        }
-    }, [dataUpdate, form]);
+  const { preview, handleChangeFile, resetImage, setPreviewFromUrl } =
+    useImageUpload(form, "avatar", "avatars");
 
-    const handleOnchangeFile = (e) => {
-        const selectedFile = e.target.files?.[0];
-        if (!selectedFile) return;
-        setFile(selectedFile);
-        setPreview(URL.createObjectURL(selectedFile));
+  // ✅ load roles khi mở modal
+  useEffect(() => {
+    if (!openUpdate) return;
+
+    const loadRoles = async () => {
+      const res = await getAllRoles();
+      setRoles(res?.data || []);
     };
 
-    const handleSubmit = async (values) => {
-        setLoading(true);
-        try {
-            const res = await updateUserAPI(dataUpdate.id, {
-                ...values,
-                avatar: file,
-            });
-            api.success({
-                message: "Thành Công",
-                description: res?.message
-            });
-            resetAndClose();
-            await loadUser();
-        } catch (error) {
-            if (error.errors?.length > 0) {
-                const formErrors = error.errors.map(err => ({
-                    name: err.field.replace("body.", ""),
-                    errors: [err.message],
-                }));
+    loadRoles();
+  }, [openUpdate]);
 
-                console.log("Setting form errors:", formErrors);
-                form.setFields(formErrors);
-            } else {
-                api.error({
-                    message: "Thất bại",
-                    description: error.message || "Đã có lỗi xảy ra",
-                });
-            }
-        } finally {
-            setLoading(false);
-        }
+  // ✅ fill data (FIX dependency)
+  useEffect(() => {
+    if (!dataUpdate?.id) return;
+
+    form.setFieldsValue({
+      username: dataUpdate.username,
+      fullName: dataUpdate.fullName,
+      phone: dataUpdate.phone,
+      roleId: dataUpdate.role?.id,
+      avatar: dataUpdate.avatar,
+    });
+
+    if (dataUpdate.avatar) {
+      setPreviewFromUrl(dataUpdate.avatar);
+    }
+  }, [dataUpdate]); // ✅ fix giống Brand
+
+  // ✅ reset sạch
+  const reset = () => {
+    form.resetFields();
+    resetImage();
+    setDataUpdate(null);
+    setOpenUpdate(false);
+    setRoles([]);
+  };
+
+  // ✅ submit (KHÔNG thêm ?t=)
+  const handleSubmit = async (values) => {
+    const payload = {
+      fullName: values.fullName,
+      phone: values.phone,
+      roleId: values.roleId,
+      avatar: values.avatar, // ✅ giữ sạch
     };
 
-    const resetAndClose = () => {
-        form.resetFields();
-        setFile(null);
-        setPreview(null);
-        setDataUpdate(null);
-        setOpenUpdate(false);
-    };
+    await update(dataUpdate.id, payload, form);
+    await loadUser();
+    reset();
+  };
 
-    return (
-        <>
-            {contextHolder}
-            <Modal
-                title={<div style={{ textAlign: "center" }}>Cập nhật người dùng</div>}
-                open={openUpdate}
-                confirmLoading={loading}
-                onOk={() => form.submit()}
-                onCancel={resetAndClose}
-                okText="Cập nhật"
-                cancelText="Huỷ"
-                centered
-                maskClosable={false}
-                width={600}
-            >
-                <Form form={form} layout="vertical" onFinish={handleSubmit}>
-                    <Form.Item label="Email" name="username" rules={[{ required: true, message: "Nhập email" }]}>
-                        <Input disabled />
-                    </Form.Item>
+  return (
+    <BaseModal
+      open={openUpdate}
+      onOk={() => form.submit()}
+      onCancel={reset}
+      title="Cập nhật người dùng"
+      okText="Cập nhật"
+    >
+      <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <Form.Item label="Email" name="username">
+          <Input disabled />
+        </Form.Item>
 
-                    <Form.Item label="Họ và tên" name="fullName" rules={[{ required: true, message: "Họ tên không được để trống" }]}>
-                        <Input />
-                    </Form.Item>
+        <Form.Item
+          label="Họ và tên"
+          name="fullName"
+          rules={[{ required: true, message: "Không được để trống" }]}
+        >
+          <Input />
+        </Form.Item>
 
-                    <Form.Item label="Số điện thoại" name="phone" rules={[{ required: true, message: "Số điện thoại không được để trống" }]}>
-                        <Input />
-                    </Form.Item>
+        <Form.Item
+          label="Số điện thoại"
+          name="phone"
+          rules={[{ required: true, message: "Không được để trống" }]}
+        >
+          <Input />
+        </Form.Item>
 
-                    <Form.Item label="Phân quyền" name="roleId" rules={[{ required: true, message: "Role không được để trống" }]}>
-                        <Select options={roles.map(r => ({ label: r.name, value: r.id }))} />
-                    </Form.Item>
+        <Form.Item
+          label="Phân quyền"
+          name="roleId"
+          rules={[{ required: true, message: "Không được để trống" }]}
+        >
+          <Select
+            options={roles.map((r) => ({
+              label: r.name,
+              value: r.id,
+            }))}
+          />
+        </Form.Item>
 
-                    <Form.Item label="Avatar" name="avatar" required>
-                        <div style={{ textAlign: "center", marginBottom: 12 }}>
-                            <label
-                                htmlFor="upload"
-                                style={{
-                                    padding: "10px 20px",
-                                    background: "#1677ff",
-                                    color: "#fff",
-                                    borderRadius: 6,
-                                    cursor: "pointer",
-                                    display: "inline-block",
-                                }}
-                            >
-                                <UploadOutlined /> Upload ảnh avatar
-                            </label>
-                            <input
-                                id="upload"
-                                type="file"
-                                hidden
-                                accept="image/*"
-                                onChange={handleOnchangeFile}
-                            />
-                        </div>
-                    </Form.Item>
-
-                    {preview && (
-                        <div style={{
-                            textAlign: "center",
-                            display: "flex",
-                            justifyContent: "center",
-                            marginTop: 16
-                        }}>
-                            <img
-                                src={preview}
-                                alt="preview"
-                                style={{
-                                    maxHeight: 200,
-                                    maxWidth: "100%",
-                                    objectFit: "contain",
-                                    borderRadius: 6
-                                }}
-                            />
-                        </div>
-                    )}
-                </Form>
-            </Modal>
-        </>
-    );
+        <Form.Item
+          label="Avatar"
+          name="avatar"
+          rules={[{ required: true, message: "Vui lòng chọn avatar" }]}
+        >
+          <UploadImage
+            preview={preview}
+            onChange={handleChangeFile}
+            label="Upload avatar"
+          />
+        </Form.Item>
+      </Form>
+    </BaseModal>
+  );
 }
