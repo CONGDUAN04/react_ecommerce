@@ -24,6 +24,7 @@ const ROUTE_TITLES = [
   ["/admin/categories", "Danh mục"],
   ["/admin/brands", "Thương hiệu"],
   ["/admin/users", "Người dùng"],
+  ["/admin/roles", "Vai trò"],
   ["/admin/settings", "Cài đặt"],
 ];
 

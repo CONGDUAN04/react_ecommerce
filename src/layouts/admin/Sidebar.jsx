@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useContext } from "react";
+import { useState, useEffect, useMemo, useContext } from "react";
 import {
   Package,
   Users,
@@ -10,6 +10,7 @@ import {
   Tags,
   BadgeCheck,
   Boxes,
+  ShieldCheck,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../../contexts/auth.context.jsx";
@@ -23,6 +24,7 @@ const getActiveMenuFromPath = (path) => {
     "/admin/categories": { menu: "categories", subMenu: null },
     "/admin/brands": { menu: "brands", subMenu: null },
     "/admin/users": { menu: "users", subMenu: null },
+    "/admin/roles": { menu: "roles", subMenu: null },
     "/admin/targets": { menu: "targets", subMenu: null },
   };
 
@@ -50,46 +52,52 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
       {
         id: "dashboard",
         label: "Dashboard",
-        icon: LayoutDashboard,
+        icon: LayoutDashboard, // ✅ chuẩn
         path: "/admin",
       },
       {
         id: "product-groups",
         label: "Nhóm sản phẩm",
-        icon: Boxes,
+        icon: Boxes, // ✅ rất hợp (group)
         path: "/admin/product-groups",
         subMenu: [
           {
             id: "products",
             label: "Sản phẩm",
             path: "/admin/products",
-            icon: Package,
+            icon: Package, // ✅ sản phẩm
           },
           {
             id: "colors",
             label: "Màu sắc",
             path: "/admin/products/colors",
-            icon: Droplet,
+            icon: Droplet, // ✅ màu
           },
         ],
       },
       {
         id: "categories",
         label: "Danh mục sản phẩm",
-        icon: Tags,
+        icon: Tags, // ✅ category
         path: "/admin/categories",
       },
       {
         id: "users",
         label: "Người dùng",
-        icon: Users,
+        icon: Users, // ✅ user
         path: "/admin/users",
       },
       {
         id: "brands",
         label: "Thương hiệu",
-        icon: BadgeCheck,
+        icon: BadgeCheck, // ✅ brand (badge = hợp lý)
         path: "/admin/brands",
+      },
+      {
+        id: "roles",
+        label: "Phân quyền",
+        icon: ShieldCheck, // 🔥 BEST CHOICE
+        path: "/admin/roles",
       },
     ],
     [],
