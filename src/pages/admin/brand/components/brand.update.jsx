@@ -13,13 +13,13 @@ export default function UpdateBrandForm({
   loadBrand,
 }) {
   const [form] = Form.useForm();
-
   const { update } = useBrand();
+
   const { preview, handleChangeFile, setPreviewFromUrl, resetImage } =
-    useImageUpload(form);
+    useImageUpload(form, "logo", "brands");
 
   useEffect(() => {
-    if (!dataUpdate) return;
+    if (!dataUpdate?.id) return;
 
     form.setFieldsValue({
       id: dataUpdate.id,
@@ -27,8 +27,10 @@ export default function UpdateBrandForm({
       logo: dataUpdate.logo,
     });
 
-    setPreviewFromUrl(dataUpdate.logo);
-  }, [dataUpdate?.id]);
+    if (dataUpdate.logo) {
+      setPreviewFromUrl(dataUpdate.logo);
+    }
+  }, [dataUpdate]);
 
   const reset = () => {
     form.resetFields();
@@ -36,7 +38,6 @@ export default function UpdateBrandForm({
     setDataUpdate(null);
     setOpenUpdate(false);
   };
-
   const handleSubmit = async (values) => {
     const payload = {
       name: values.name,
@@ -44,7 +45,6 @@ export default function UpdateBrandForm({
     };
 
     await update(dataUpdate.id, payload, form);
-
     await loadBrand();
     reset();
   };
@@ -55,6 +55,7 @@ export default function UpdateBrandForm({
       onOk={() => form.submit()}
       onCancel={reset}
       title="Cập nhật thương hiệu"
+      okText="Cập nhật"
     >
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item label="ID" name="id">
@@ -64,7 +65,7 @@ export default function UpdateBrandForm({
         <Form.Item
           label="Tên thương hiệu"
           name="name"
-          rules={[{ required: true }]}
+          rules={[{ required: true, message: "Không được để trống" }]}
         >
           <Input />
         </Form.Item>

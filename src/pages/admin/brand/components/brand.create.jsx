@@ -11,7 +11,11 @@ export default function CreateBrandForm({ loadBrand }) {
   const [form] = Form.useForm();
 
   const { create } = useBrand();
-  const { preview, handleChangeFile, resetImage } = useImageUpload(form);
+  const { preview, handleChangeFile, resetImage } = useImageUpload(
+    form,
+    "logo",
+    "brands",
+  );
 
   const reset = () => {
     form.resetFields();
@@ -45,20 +49,21 @@ export default function CreateBrandForm({ loadBrand }) {
           <Form.Item
             label="Tên thương hiệu"
             name="name"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Tên không được để trống" }]}
           >
             <Input />
           </Form.Item>
 
           <Form.Item
-            label="Logo"
-            name="logo"
-            rules={[{ required: true, message: "Vui lòng chọn logo" }]}
+            label="Avatar"
+            name="avatar"
+            valuePropName="value"
+            rules={[{ required: true, message: "Vui lòng chọn avatar" }]}
           >
             <UploadImage
               preview={preview}
               onChange={handleChangeFile}
-              label="Upload logo"
+              label="Upload avatar"
             />
           </Form.Item>
         </Form>
