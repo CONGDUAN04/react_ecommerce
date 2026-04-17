@@ -14,6 +14,7 @@ export const renderId = () => ({
   dataIndex: "id",
   width: 70,
   align: "center",
+  responsive: ["md"],
   render: (id) => (
     <span style={{ color: "#1677ff", fontWeight: 600, fontSize: 13 }}>
       #{id}

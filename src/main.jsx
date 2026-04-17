@@ -19,6 +19,8 @@ import { AuthWrapper } from "./contexts/auth.context.jsx";
 import NotifyProvider from "./contexts/notify.provider.jsx";
 import LoadingProvider from "./contexts/loading.context.jsx";
 import GlobalSpin from "./components/common/global.spin.jsx";
+import UserPage from "./pages/admin/user/index.jsx";
+import RolePage from "./pages/admin/role/index.jsx";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +34,8 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: "categories", element: <CategoryPage /> },
       { path: "brands", element: <BrandPage /> },
+      { path: "users", element: <UserPage /> },
+      { path: "roles", element: <RolePage /> },
     ],
   },
   {
