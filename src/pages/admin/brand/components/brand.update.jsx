@@ -15,8 +15,17 @@ export default function UpdateBrandForm({
   const [form] = Form.useForm();
   const { update } = useBrand();
 
-  const { preview, handleChangeFile, setPreviewFromUrl, resetImage } =
-    useImageUpload(form, "logo", "brands");
+  const {
+    preview,
+    handleChangeFile,
+    setPreviewFromUrl,
+    resetImage,
+    uploading,
+  } = useImageUpload(form, {
+    type: "brand",
+    fieldName: "logo",
+    fieldId: "logoId",
+  });
 
   useEffect(() => {
     if (!dataUpdate?.id) return;
@@ -25,9 +34,10 @@ export default function UpdateBrandForm({
       id: dataUpdate.id,
       name: dataUpdate.name,
       logo: dataUpdate.logo,
+      logoId: dataUpdate.logoId,
     });
 
-    if (dataUpdate.logo) {
+    if (dataUpdate.logo && !preview) {
       setPreviewFromUrl(dataUpdate.logo);
     }
   }, [dataUpdate]);
@@ -38,15 +48,19 @@ export default function UpdateBrandForm({
     setDataUpdate(null);
     setOpenUpdate(false);
   };
+
   const handleSubmit = async (values) => {
     const payload = {
       name: values.name,
       logo: values.logo,
+      logoId: values.logoId,
     };
 
-    await update(dataUpdate.id, payload, form);
-    await loadBrand();
-    reset();
+    const res = await update(dataUpdate.id, payload, form);
+    if (res) {
+      reset();
+      await loadBrand();
+    }
   };
 
   return (
@@ -70,16 +84,26 @@ export default function UpdateBrandForm({
           <Input />
         </Form.Item>
 
-        <Form.Item
-          label="Logo"
-          name="logo"
-          rules={[{ required: true, message: "Vui lòng chọn logo" }]}
-        >
+        <Form.Item label="Logo">
           <UploadImage
             preview={preview}
             onChange={handleChangeFile}
+            uploading={uploading}
+            disabled={uploading}
             label="Upload logo"
           />
+        </Form.Item>
+
+        <Form.Item
+          name="logo"
+          rules={[{ required: true, message: "Vui lòng chọn logo" }]}
+          hidden
+        >
+          <Input />
+        </Form.Item>
+
+        <Form.Item name="logoId" hidden>
+          <Input />
         </Form.Item>
       </Form>
     </BaseModal>

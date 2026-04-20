@@ -1,70 +1,99 @@
 import { useState, useRef } from "react";
-import { uploadCloudinary } from "../utils/uploadCloudinary";
-import { message } from "antd";
+import axios from "axios";
+import { getUploadSignatureAPI } from "../services/api.upload";
 
-export const useImageUpload = (
-  form,
-  fieldName = "image",
-  folder = "default",
-) => {
+export const useImageUpload = (form, config) => {
+  const { type, fieldName, fieldId } = config;
+
   const [preview, setPreview] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [uploadedUrl, setUploadedUrl] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
-  // ✅ Giữ form ref luôn fresh
-  const formRef = useRef(form);
-  formRef.current = form;
+  const objectUrlRef = useRef(null);
 
   const handleChangeFile = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const rawFile = e?.target?.files?.[0];
 
-    if (!file.type.startsWith("image/")) {
-      message.error("Chỉ được upload file ảnh!");
-      return;
+    if (!rawFile || !(rawFile instanceof File)) return;
+
+    if (!rawFile.type.startsWith("image/")) return;
+
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
     }
 
-    setPreview(URL.createObjectURL(file));
-    setLoading(true);
+    const objectUrl = URL.createObjectURL(rawFile);
+    objectUrlRef.current = objectUrl;
+    setPreview(objectUrl);
+
+    setUploading(true);
 
     try {
-      const url = await uploadCloudinary(file, folder);
+      const data = await getUploadSignatureAPI(type);
 
-      setUploadedUrl(url);
+      if (!data?.apiKey || !data?.cloudName) {
+        throw new Error();
+      }
 
-      // ✅ Dùng formRef thay vì form trực tiếp
-      formRef.current?.setFieldsValue({
-        [fieldName]: url,
+      const formData = new FormData();
+      formData.append("file", rawFile);
+      formData.append("api_key", data.apiKey);
+      formData.append("timestamp", data.timestamp);
+      formData.append("signature", data.signature);
+      formData.append("folder", data.folder);
+      formData.append("public_id", data.public_id);
+
+      const res = await axios.post(
+        `https://api.cloudinary.com/v1_1/${data.cloudName}/image/upload`,
+        formData,
+      );
+
+      const imageUrl = res.data.secure_url;
+      const publicId = res.data.public_id;
+
+      setPreview(imageUrl);
+
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
+
+      form.setFieldsValue({
+        [fieldName]: imageUrl,
+        [fieldId]: publicId,
       });
-
-      setPreview(url);
-    } catch (err) {
-      message.error("Upload ảnh thất bại!");
+    } catch {
+      form.setFieldsValue({
+        [fieldName]: null,
+        [fieldId]: null,
+      });
     } finally {
-      setLoading(false);
+      setUploading(false);
     }
-  };
-
-  // ✅ Reset sạch hoàn toàn
-  const resetImage = () => {
-    setPreview(null);
-    setUploadedUrl(null);
-    formRef.current?.setFieldsValue({
-      [fieldName]: null,
-    });
   };
 
   const setPreviewFromUrl = (url) => {
-    setPreview(url);
-    setUploadedUrl(url);
+    if (url) setPreview(url);
+  };
+
+  const resetImage = () => {
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
+    }
+
+    setPreview(null);
+
+    form.setFieldsValue({
+      [fieldName]: null,
+      [fieldId]: null,
+    });
   };
 
   return {
     preview,
-    loading,
-    uploadedUrl,
+    uploading,
     handleChangeFile,
-    resetImage,
     setPreviewFromUrl,
+    resetImage,
   };
 };

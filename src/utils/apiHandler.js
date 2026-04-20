@@ -8,24 +8,14 @@ export const handleApiSuccess = (api, message) => {
 
 export const handleApiError = (api, err, form) => {
   const error = err?.error || err;
-  if (
-    (error?.code === "VALIDATION_ERROR" || error?.ErrorCode === 1) &&
-    error?.errors
-  ) {
-    const fieldMapping = {
-      username: "email",
-      password: "password",
-    };
-
-    const formErrors = error.errors.map((e) => ({
-      name: fieldMapping[e.field] || e.field,
-      errors: [e.message],
-    }));
-
-    if (form) {
-      form.setFields(formErrors);
-      return;
-    }
+  if (form && error?.errors?.length > 0) {
+    form.setFields(
+      error.errors.map((e) => ({
+        name: e.field,
+        errors: [e.message],
+      })),
+    );
+    return;
   }
 
   if (error?.code === "CONFLICT" || error?.ErrorCode === 2) {
