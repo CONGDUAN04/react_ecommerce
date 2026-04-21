@@ -1,13 +1,14 @@
 import { Descriptions, Empty } from "antd";
 import BaseModal from "../../../../components/common/BaseModal.jsx";
-import dayjs from "dayjs";
+import ImagePreviewItem from "../../../../components/common/ImagePreviewItem.jsx";
+import { formatDateTime } from "../../../../utils/formatDate.js";
 
-const CategoryDetail = ({
+export default function CategoryDetail({
   dataDetail,
   setDataDetail,
   openDetail,
   setOpenDetail,
-}) => {
+}) {
   const handleClose = () => {
     setDataDetail(null);
     setOpenDetail(false);
@@ -19,32 +20,31 @@ const CategoryDetail = ({
       onCancel={handleClose}
       title="Chi tiết danh mục"
       footer={null}
-      width={600}
     >
       {!dataDetail ? (
         <Empty />
       ) : (
-        <>
-          <Descriptions column={1} bordered size="small">
-            <Descriptions.Item label="ID">{dataDetail.id}</Descriptions.Item>
-            <Descriptions.Item label="Tên">{dataDetail.name}</Descriptions.Item>
-            <Descriptions.Item label="Slug">
-              {dataDetail.slug || "N/A"}
-            </Descriptions.Item>
-          </Descriptions>
+        <Descriptions column={1} bordered>
+          <Descriptions.Item label="ID">{dataDetail.id}</Descriptions.Item>
+          <Descriptions.Item label="Tên">{dataDetail.name}</Descriptions.Item>
+          <Descriptions.Item label="Slug">{dataDetail.slug}</Descriptions.Item>
 
-          <div style={{ marginTop: 12, textAlign: "right", color: "#999" }}>
-            <div>
-              Tạo: {dayjs(dataDetail.createdAt).format("DD/MM/YYYY HH:mm")}
-            </div>
-            <div>
-              Cập nhật: {dayjs(dataDetail.updatedAt).format("DD/MM/YYYY HH:mm")}
-            </div>
-          </div>
-        </>
+          <Descriptions.Item label="Icon">
+            <ImagePreviewItem
+              src={`${dataDetail.icon}?t=${dataDetail.updatedAt}`}
+              variant="icon"
+            />
+          </Descriptions.Item>
+
+          <Descriptions.Item label="Ngày tạo">
+            {formatDateTime(dataDetail.createdAt)}
+          </Descriptions.Item>
+
+          <Descriptions.Item label="Cập nhật">
+            {formatDateTime(dataDetail.updatedAt)}
+          </Descriptions.Item>
+        </Descriptions>
       )}
     </BaseModal>
   );
-};
-
-export default CategoryDetail;
+}

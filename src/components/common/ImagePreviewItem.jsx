@@ -2,24 +2,23 @@ import { Image } from "antd";
 
 export default function ImagePreviewItem({
   src,
-  size = 160, // default đẹp hơn
+  size,
+  variant = "logo", // logo | icon
 }) {
   if (!src) return "N/A";
 
+  const finalSize = size || (variant === "icon" ? 60 : 160);
+
   return (
     <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        padding: "16px 0",
-      }}
+      style={{ display: "flex", justifyContent: "center", padding: "12px 0" }}
     >
       <div
         style={{
-          width: size,
-          height: size,
+          width: finalSize,
+          height: finalSize,
           border: "1px dashed #d9d9d9",
-          borderRadius: 12,
+          borderRadius: variant === "icon" ? 8 : 12,
           display: "flex",
           justifyContent: "center",
           alignItems: "center",

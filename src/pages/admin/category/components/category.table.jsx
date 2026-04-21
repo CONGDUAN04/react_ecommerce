@@ -34,6 +34,31 @@ export const CategoryTable = (props) => {
     renderIndex(current, pageSize),
     renderId(),
     {
+      title: <div style={{ fontWeight: 600 }}>Icon</div>,
+      dataIndex: "icon",
+      width: 120,
+      align: "center",
+      render: (icon) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <img
+            src={icon}
+            alt="icon"
+            style={{
+              width: 40,
+              height: 40,
+              objectFit: "contain",
+            }}
+          />
+        </div>
+      ),
+    },
+    {
       title: <div style={{ fontWeight: 600 }}>Tên danh mục</div>,
       dataIndex: "name",
       width: 260,

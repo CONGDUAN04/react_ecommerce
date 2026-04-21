@@ -24,6 +24,7 @@ export default function BrandDetail({ dataDetail, openDetail, setOpenDetail }) {
           <Descriptions.Item label="Logo">
             <ImagePreviewItem
               src={`${dataDetail.logo}?t=${dataDetail.updatedAt}`}
+              variant="logo"
             />
           </Descriptions.Item>
           <Descriptions.Item label="Ngày tạo">
