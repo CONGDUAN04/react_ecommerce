@@ -8,6 +8,10 @@ export default function UploadImage({
   uploading,
   label = "Upload ảnh",
   disabled = false,
+
+  // 👇 thêm 2 props từ Form.Item
+  status,
+  help,
 }) {
   const inputRef = useRef(null);
 
@@ -16,15 +20,19 @@ export default function UploadImage({
     if (inputRef.current) inputRef.current.value = "";
   };
 
+  const isError = status === "error";
+
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: 16,
+        gap: 8,
+        width: "100%",
       }}
     >
+      {/* BUTTON */}
       <label
         style={{
           padding: "10px 18px",
@@ -51,6 +59,7 @@ export default function UploadImage({
         />
       </label>
 
+      {/* PREVIEW */}
       {preview && (
         <div
           style={{
@@ -63,6 +72,9 @@ export default function UploadImage({
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+
+            // 🔥 highlight lỗi
+            border: isError ? "2px solid #ff4d4f" : "1px solid #ddd",
           }}
         >
           <img
@@ -92,6 +104,19 @@ export default function UploadImage({
               <span style={{ fontSize: 12 }}>Đang tải...</span>
             </div>
           )}
+        </div>
+      )}
+
+      {/* 🔴 ERROR TEXT */}
+      {isError && help && (
+        <div
+          style={{
+            color: "#ff4d4f",
+            fontSize: 12,
+            textAlign: "center",
+          }}
+        >
+          {help}
         </div>
       )}
     </div>

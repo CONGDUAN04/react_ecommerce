@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
-import axios from "axios";
-import { getUploadSignatureAPI } from "../services/api.upload";
+import { validateImageFile } from "../utils/fileValidator";
+import { uploadToCloudinary } from "../utils/uploadCloudinary";
 
 export const useImageUpload = (form, config) => {
   const { type, fieldName, fieldId } = config;
@@ -9,70 +9,74 @@ export const useImageUpload = (form, config) => {
   const [uploading, setUploading] = useState(false);
 
   const objectUrlRef = useRef(null);
+  const pendingFileRef = useRef(null);
 
-  const handleChangeFile = async (e) => {
-    const rawFile = e?.target?.files?.[0];
-
-    if (!rawFile || !(rawFile instanceof File)) return;
-
-    if (!rawFile.type.startsWith("image/")) return;
-
+  const setPreviewFromUrl = (url) => {
     if (objectUrlRef.current) {
       URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
     }
 
-    const objectUrl = URL.createObjectURL(rawFile);
+    pendingFileRef.current = null;
+    setPreview(url);
+  };
+
+  const handleChangeFile = async (e) => {
+    const file = e?.target?.files?.[0];
+    if (!file) return;
+
+    if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+
+    const objectUrl = URL.createObjectURL(file);
     objectUrlRef.current = objectUrl;
     setPreview(objectUrl);
+
+    pendingFileRef.current = file;
+
+    form.setFieldsValue({ [fieldName]: file, [fieldId]: null });
 
     setUploading(true);
 
     try {
-      const data = await getUploadSignatureAPI(type);
+      const check = validateImageFile(file);
 
-      if (!data?.apiKey || !data?.cloudName) {
-        throw new Error();
+      if (!check.valid) {
+        await new Promise((r) => setTimeout(r, 500));
+        return;
       }
 
-      const formData = new FormData();
-      formData.append("file", rawFile);
-      formData.append("api_key", data.apiKey);
-      formData.append("timestamp", data.timestamp);
-      formData.append("signature", data.signature);
-      formData.append("folder", data.folder);
-      formData.append("public_id", data.public_id);
-
-      const res = await axios.post(
-        `https://api.cloudinary.com/v1_1/${data.cloudName}/image/upload`,
-        formData,
-      );
-
-      const imageUrl = res.data.secure_url;
-      const publicId = res.data.public_id;
+      const { imageUrl, publicId } = await uploadToCloudinary(file, type);
 
       setPreview(imageUrl);
 
-      if (objectUrlRef.current) {
-        URL.revokeObjectURL(objectUrlRef.current);
-        objectUrlRef.current = null;
-      }
+      form.setFieldsValue({ [fieldName]: imageUrl, [fieldId]: publicId });
 
-      form.setFieldsValue({
-        [fieldName]: imageUrl,
-        [fieldId]: publicId,
-      });
+      pendingFileRef.current = null;
     } catch {
-      form.setFieldsValue({
-        [fieldName]: null,
-        [fieldId]: null,
-      });
+      form.setFields([{ name: fieldName, errors: ["Upload thất bại"] }]);
+      setPreview(null);
     } finally {
       setUploading(false);
     }
   };
 
-  const setPreviewFromUrl = (url) => {
-    if (url) setPreview(url);
+  const logoValidator = async (_, value) => {
+    const file = pendingFileRef.current;
+
+    if (!file && !value) {
+      return Promise.reject("Vui lòng chọn ảnh");
+    }
+
+    if (typeof value === "string" && value.startsWith("http")) {
+      return Promise.resolve();
+    }
+
+    const check = validateImageFile(file);
+    if (!check.valid) {
+      return Promise.reject(check.message);
+    }
+
+    return Promise.resolve();
   };
 
   const resetImage = () => {
@@ -81,19 +85,19 @@ export const useImageUpload = (form, config) => {
       objectUrlRef.current = null;
     }
 
+    pendingFileRef.current = null;
     setPreview(null);
 
-    form.setFieldsValue({
-      [fieldName]: null,
-      [fieldId]: null,
-    });
+    form.setFieldsValue({ [fieldName]: null, [fieldId]: null });
+    form.setFields([{ name: fieldName, errors: [] }]);
   };
 
   return {
     preview,
     uploading,
     handleChangeFile,
-    setPreviewFromUrl,
+    logoValidator,
     resetImage,
+    setPreviewFromUrl,
   };
 };

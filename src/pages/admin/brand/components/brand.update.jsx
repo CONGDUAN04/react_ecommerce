@@ -21,6 +21,7 @@ export default function UpdateBrandForm({
     setPreviewFromUrl,
     resetImage,
     uploading,
+    logoValidator,
   } = useImageUpload(form, {
     type: "brand",
     fieldName: "logo",
@@ -50,13 +51,7 @@ export default function UpdateBrandForm({
   };
 
   const handleSubmit = async (values) => {
-    const payload = {
-      name: values.name,
-      logo: values.logo,
-      logoId: values.logoId,
-    };
-
-    const res = await update(dataUpdate.id, payload, form);
+    const res = await update(dataUpdate.id, values, form);
     if (res) {
       reset();
       await loadBrand();
@@ -84,22 +79,16 @@ export default function UpdateBrandForm({
           <Input />
         </Form.Item>
 
-        <Form.Item label="Logo">
+        <Form.Item
+          label="Logo"
+          name="logo"
+          rules={[{ validator: logoValidator }]}
+        >
           <UploadImage
             preview={preview}
-            onChange={handleChangeFile}
             uploading={uploading}
-            disabled={uploading}
-            label="Upload logo"
+            onChange={handleChangeFile}
           />
-        </Form.Item>
-
-        <Form.Item
-          name="logo"
-          rules={[{ required: true, message: "Vui lòng chọn logo" }]}
-          hidden
-        >
-          <Input />
         </Form.Item>
 
         <Form.Item name="logoId" hidden>

@@ -9,16 +9,14 @@ import { useImageUpload } from "../../../../hooks/useImageUpload.js";
 export default function CreateBrandForm({ loadBrand }) {
   const [isOpen, setIsOpen] = useState(false);
   const [form] = Form.useForm();
-
   const { create } = useBrand();
-  const { preview, handleChangeFile, resetImage, uploading } = useImageUpload(
-    form,
-    {
+
+  const { preview, handleChangeFile, resetImage, uploading, logoValidator } =
+    useImageUpload(form, {
       type: "brand",
       fieldName: "logo",
       fieldId: "logoId",
-    },
-  );
+    });
 
   const reset = () => {
     form.resetFields();
@@ -27,13 +25,7 @@ export default function CreateBrandForm({ loadBrand }) {
   };
 
   const handleSubmit = async (values) => {
-    const payload = {
-      name: values.name,
-      logo: values.logo,
-      logoId: values.logoId,
-    };
-
-    const res = await create(payload, form);
+    const res = await create(values, form);
     if (res) {
       reset();
       await loadBrand();
@@ -49,9 +41,7 @@ export default function CreateBrandForm({ loadBrand }) {
 
       <BaseModal
         open={isOpen}
-        onOk={() => {
-          form.submit();
-        }}
+        onOk={() => form.submit()}
         onCancel={reset}
         okText="Tạo mới"
         title="Tạo thương hiệu"
@@ -60,26 +50,21 @@ export default function CreateBrandForm({ loadBrand }) {
           <Form.Item
             label="Tên thương hiệu"
             name="name"
-            rules={[{ required: true, message: "Tên không được để trống" }]}
+            rules={[{ required: true, message: "Không được để trống" }]}
           >
             <Input />
           </Form.Item>
 
-          <Form.Item label="Logo">
+          <Form.Item
+            label="Logo"
+            name="logo"
+            rules={[{ validator: logoValidator }]}
+          >
             <UploadImage
               preview={preview}
               uploading={uploading}
               onChange={handleChangeFile}
-              label="Upload logo"
             />
-          </Form.Item>
-
-          <Form.Item
-            name="logo"
-            rules={[{ required: true, message: "Vui lòng chọn logo" }]}
-            hidden
-          >
-            <Input />
           </Form.Item>
 
           <Form.Item name="logoId" hidden>
