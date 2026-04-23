@@ -41,10 +41,9 @@ const LoginPage = () => {
       localStorage.setItem("user", JSON.stringify(user));
 
       handleApiSuccess(api, "Đăng nhập thành công!");
+      const role = user?.role?.name;
 
-      setTimeout(() => {
-        navigate(user?.role?.name === "ADMIN" ? "/admin" : "/");
-      }, 500);
+      navigate(role === "ADMIN" || role === "SUPER_ADMIN" ? "/admin" : "/");
     } catch (err) {
       handleApiError(api, err, form);
     }

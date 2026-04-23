@@ -19,10 +19,20 @@ export default function UpdateUserForm({
   const { update } = useUser();
   const { getAll: getAllRoles } = useRole();
 
-  const { preview, handleChangeFile, resetImage, setPreviewFromUrl } =
-    useImageUpload(form, "avatar", "avatars");
+  const {
+    preview,
+    handleChangeFile,
+    resetImage,
+    setPreviewFromUrl,
+    uploading,
+    logoValidator,
+  } = useImageUpload(form, {
+    type: "user",
+    fieldName: "avatar",
+    fieldId: "avatarId",
+  });
 
-  // ✅ load roles khi mở modal
+  // load roles
   useEffect(() => {
     if (!openUpdate) return;
 
@@ -34,7 +44,7 @@ export default function UpdateUserForm({
     loadRoles();
   }, [openUpdate]);
 
-  // ✅ fill data (FIX dependency)
+  // fill data
   useEffect(() => {
     if (!dataUpdate?.id) return;
 
@@ -44,14 +54,14 @@ export default function UpdateUserForm({
       phone: dataUpdate.phone,
       roleId: dataUpdate.role?.id,
       avatar: dataUpdate.avatar,
+      avatarId: dataUpdate.avatarId,
     });
 
-    if (dataUpdate.avatar) {
+    if (dataUpdate.avatar && !preview) {
       setPreviewFromUrl(dataUpdate.avatar);
     }
-  }, [dataUpdate]); // ✅ fix giống Brand
+  }, [dataUpdate]);
 
-  // ✅ reset sạch
   const reset = () => {
     form.resetFields();
     resetImage();
@@ -60,18 +70,26 @@ export default function UpdateUserForm({
     setRoles([]);
   };
 
-  // ✅ submit (KHÔNG thêm ?t=)
   const handleSubmit = async (values) => {
-    const payload = {
-      fullName: values.fullName,
-      phone: values.phone,
-      roleId: values.roleId,
-      avatar: values.avatar, // ✅ giữ sạch
-    };
+    const payload = { ...values };
+    console.log("Payload gửi lên:", payload); // ← Debug ở đây
+    console.log("Avatar:", payload.avatar);
+    console.log("AvatarId:", payload.avatarId);
+    if (Number(payload.roleId) === Number(dataUpdate.role?.id)) {
+      delete payload.roleId;
+    }
 
-    await update(dataUpdate.id, payload, form);
-    await loadUser();
-    reset();
+    const res = await update(dataUpdate.id, payload, form);
+    console.log("========== RESPONSE API ==========");
+    console.log("Full response:", res);
+    console.log("Data trong response:", res?.data);
+    console.log("Avatar trong response:", res?.data?.avatar);
+    console.log("AvatarId trong response:", res?.data?.avatarId);
+
+    if (res) {
+      reset();
+      await loadUser();
+    }
   };
 
   return (
@@ -119,13 +137,17 @@ export default function UpdateUserForm({
         <Form.Item
           label="Avatar"
           name="avatar"
-          rules={[{ required: true, message: "Vui lòng chọn avatar" }]}
+          rules={[{ validator: logoValidator }]}
         >
           <UploadImage
             preview={preview}
+            uploading={uploading}
             onChange={handleChangeFile}
-            label="Upload avatar"
           />
+        </Form.Item>
+
+        <Form.Item name="avatarId" hidden>
+          <Input />
         </Form.Item>
       </Form>
     </BaseModal>

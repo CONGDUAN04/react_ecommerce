@@ -3,7 +3,6 @@ import * as ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "antd/dist/reset.css";
 import "../src/index.css";
-import "nprogress/nprogress.css";
 
 import AppAdmin from "./AppAdmin.jsx";
 import AppClient from "./AppClient.jsx";

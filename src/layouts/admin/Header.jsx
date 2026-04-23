@@ -113,14 +113,7 @@ export default function Header({ toggleSidebar }) {
           {/* user */}
           <div className="user" onClick={() => setDropOpen(!dropOpen)}>
             <div className="avatar">
-              {user?.avatar ? (
-                <img
-                  src={`${import.meta.env.VITE_BACKEND_URL}/images/avatar/${user.avatar}`}
-                  alt=""
-                />
-              ) : (
-                initials
-              )}
+              {user?.avatar ? <img src={user.avatar} alt="" /> : initials}
               <span className="online" />
             </div>
 

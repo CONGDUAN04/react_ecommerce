@@ -8,7 +8,7 @@ import {
   renderIndex,
   renderId,
 } from "../../../../components/common/tableColumns.jsx";
-import { Tag } from "antd";
+import { Tag, Switch, Popconfirm } from "antd";
 
 export default function UserTable({
   dataUsers,
@@ -24,16 +24,22 @@ export default function UserTable({
   const [openUpdate, setOpenUpdate] = useState(false);
   const [dataUpdate, setDataUpdate] = useState(null);
 
-  const { remove } = useUser();
+  const { remove, updateStatus } = useUser();
 
   const handleDelete = async (id) => {
     const res = await remove(id);
     if (res) await loadUser();
   };
 
+  const handleToggleStatus = async (record, isActive) => {
+    const res = await updateStatus(record.id, { isActive });
+    if (res) await loadUser();
+  };
+
   const columns = [
     renderIndex(current, pageSize),
     renderId(),
+
     {
       title: "Họ và tên",
       dataIndex: "fullName",
@@ -52,7 +58,42 @@ export default function UserTable({
       align: "center",
       render: (role) => <Tag color="blue">{role}</Tag>,
     },
+    {
+      title: "Trạng thái",
+      dataIndex: "isActive",
+      align: "center",
+      render: (isActive, record) => {
+        const active = isActive ?? true;
 
+        return (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 4,
+            }}
+          >
+            <Tag color={active ? "green" : "red"}>
+              {active ? "Hoạt động" : "Đã khóa"}
+            </Tag>
+
+            <Popconfirm
+              title={
+                active
+                  ? "Bạn có chắc muốn vô hiệu hóa người dùng này?"
+                  : "Bạn có chắc muốn kích hoạt lại người dùng này?"
+              }
+              okText="Xác nhận"
+              cancelText="Hủy"
+              onConfirm={() => handleToggleStatus(record, !active)}
+            >
+              <Switch size="small" checked={active} />
+            </Popconfirm>
+          </div>
+        );
+      },
+    },
     {
       title: "Thao tác",
       align: "center",
